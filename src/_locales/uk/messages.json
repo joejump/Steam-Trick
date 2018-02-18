@@ -1,0 +1,77 @@
+{
+  "description": {
+    "message": "Змінюйте нікнейм Steam одним кліком"
+  },
+  "copy": {
+    "message": "Натисніть, щоб скопіювати id64"
+  },
+  "mainTab": {
+    "message": "Головна"
+  },
+  "templateTab": {
+    "message": "Шаблони"
+  },
+  "donateTab": {
+    "message": "Віддячити"
+  },
+  "save": {
+    "message": "Зберегти"
+  },
+  "time": {
+    "message": "Час"
+  },
+  "m": {
+    "message": "хв"
+  },
+  "s": {
+    "message": "сек"
+  },
+  "change": {
+    "message": "Змінити"
+  },
+  "groupBtn": {
+    "message": "Долучитися"
+  },
+  "joinAndLeave": {
+    "message": "Долучитися і покинути"
+  },
+  "donate": {
+    "message": "Donate"
+  },
+  "top": {
+    "message": "Топ"
+  },
+  "andNew": {
+    "message": " + нове"
+  },
+  "notGroup": {
+    "message": "Це не група!"
+  },
+  "newName": {
+    "message": "Нове ім'я"
+  },
+  "myNameAndNew": {
+    "message": "Моє ім'я і нове"
+  },
+  "groupUrl": {
+    "message": "URL групи"
+  },
+  "minTime": {
+    "message": "Мінімальне значення 10 секунд"
+  },
+  "Namelength": {
+    "message": "Ім'я профілю має містити від 2 до 32 символів."
+  },
+  "emptyList": {
+    "message": "Список порожній"
+  },
+  "group": {
+    "message": "Steam Група"
+  },
+  "tooLargeFile": {
+    "message": "Файл, який ви намагалися завантажити завеликий. Завантажте файл менше ніж 1024 Кб"
+  },
+  "upload": {
+    "message": "Завантажити"
+  }
+}

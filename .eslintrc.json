@@ -1,0 +1,26 @@
+{
+    "extends": "airbnb-base",
+    "env": {
+        "browser": true,
+        "es6": true,
+        "webextensions": true
+    },
+    "rules": {
+        "indent": [
+            "error",
+            4
+        ],
+        "no-underscore-dangle": [
+            "error",
+            {
+                "allowAfterThis": true
+            }
+        ],
+        "func-names": "off",
+        "no-bitwise": "off",
+        "comma-dangle": [
+            "error",
+            "never"
+        ]
+    }
+}

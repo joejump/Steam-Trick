@@ -1,0 +1,77 @@
+{
+  "description": {
+    "message": "Меняйте никнейм в Steam одним кликом"
+  },
+  "copy": {
+    "message": "Нажмите, чтобы скопировать id64"
+  },
+  "mainTab": {
+    "message": "Главная"
+  },
+  "templateTab": {
+    "message": "Шаблоны"
+  },
+  "donateTab": {
+    "message": "Отблагодарить"
+  },
+  "save": {
+    "message": "Сохранить"
+  },
+  "time": {
+    "message": "Время"
+  },
+  "m": {
+    "message": "м"
+  },
+  "s": {
+    "message": "с"
+  },
+  "change": {
+    "message": "Изменить"
+  },
+  "groupBtn": {
+    "message": "Вступить"
+  },
+  "joinAndLeave": {
+    "message": "Врисоединиться и покинуть"
+  },
+  "donate": {
+    "message": "Donate"
+  },
+  "top": {
+    "message": "Топ!"
+  },
+  "andNew": {
+    "message": " + новое"
+  },
+  "notGroup": {
+    "message": "это не группа!"
+  },
+  "newName": {
+    "message": "Новое имя"
+  },
+  "myNameAndNew": {
+    "message": "Мое имя и новое"
+  },
+  "groupUrl": {
+    "message": "URL группы"
+  },
+  "minTime": {
+    "message": "Минимальное значение 10 секунд"
+  },
+  "Namelength": {
+    "message": "Имя вашего профиля должно содержать от 2 до 32 символов."
+  },
+  "emptyList": {
+    "message": "Список пуст"
+  },
+  "group": {
+    "message": "Steam Группа"
+  },
+  "tooLargeFile": {
+    "message": "Файл, который вы пытались загрузить, был слишком большим. Загрузите файл размером менее 1,024 КБ"
+  },
+  "upload": {
+    "message": "Загрузить"
+  }
+}

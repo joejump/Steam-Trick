@@ -1,0 +1,77 @@
+{
+  "description": {
+    "message": "Feel free to change name on Steam in one click"
+  },
+  "copy": {
+    "message": "Copy to clipboard id64"
+  },
+  "mainTab": {
+    "message": "Main"
+  },
+  "templateTab": {
+    "message": "Templates"
+  },
+  "donateTab": {
+    "message": "Donate"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "time": {
+    "message": "Time"
+  },
+  "m": {
+    "message": "m"
+  },
+  "s": {
+    "message": "s"
+  },
+  "change": {
+    "message": "Change"
+  },
+  "groupBtn": {
+    "message": "Join"
+  },
+  "joinAndLeave": {
+    "message": "Join and leave"
+  },
+  "donate": {
+    "message": "Donate"
+  },
+  "top": {
+    "message": "Top!"
+  },
+  "andNew": {
+    "message": " + new"
+  },
+  "notGroup": {
+    "message": "it's not a group"
+  },
+  "newName": {
+    "message": "New name"
+  },
+  "myNameAndNew": {
+    "message": "My name and new"
+  },
+  "groupUrl": {
+    "message": "Group URL"
+  },
+  "minTime": {
+    "message": "Min value 10 seconds"
+  },
+  "Namelength": {
+    "message": "Your Profile Name must be between 2 and 32 characters in length."
+  },
+  "emptyList": {
+    "message": "The list is empty"
+  },
+  "group": {
+    "message": "Steam group"
+  },
+  "tooLargeFile": {
+    "message": "The file you tried to upload was too large. Please upload a file smaller than 1,024KB"
+  },
+  "upload": {
+    "message": "Upload"
+  }
+}
