@@ -27,9 +27,5 @@
         "default_icon": "img/48.png",
         "default_popup": "html/popup.html"
     },
-    "short_name": "SNC",
-    "options_ui": {
-    "page": "html/options.html",
-        "chrome_style": true
-    }
+    "short_name": "SNC"
 }

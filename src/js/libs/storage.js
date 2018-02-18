@@ -1,15 +1,9 @@
 import localforage from 'localforage';
-import { getKey } from './utils';
 
 const reset = async (key, callback) => {
-    // спершу зробити без занурення(a.a.a.a)
-    try {
-        const value = await localforage.getItem(key);
-        const result = callback(value);
-        return localforage.setItem(key, result);
-    } catch (e) {
-        console.error(e);
-    }
+    const value = await localforage.getItem(key);
+    const result = callback(value);
+    return localforage.setItem(key, result);
 };
 
 export const pushElement = (key, ...items) =>

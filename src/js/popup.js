@@ -16,10 +16,9 @@ const removeTemplate = (type, index) => removeElement(`templates-${type}`, index
 const getTemplate = (type, index) => getElement(`templates-${type}`, index);
 
 const start = (user) => {
-    const bg = chrome.extension.getBackgroundPage();
     const {
-        joinToGroup, changeName, changeAvatar
-    } = bg.exports;
+        joinToGroup, changeName, changeAvatar, actionsList
+    } = chrome.extension.getBackgroundPage().exports;
 
     // const words = i18.localizeWords([
     //     'minTime',
