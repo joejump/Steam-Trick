@@ -2,7 +2,7 @@ import { getCookie } from '../libs/utils';
 
 // getSessionId form cookies
 export const getSessionId = async () => {
-    const { value: sessionId } = getCookie({ url: 'http://steamcommunity.com', name: 'sessionid' });
+    const { value: sessionId } = await getCookie({ url: 'http://steamcommunity.com', name: 'sessionid' });
     return sessionId;
 };
 

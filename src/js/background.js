@@ -40,16 +40,13 @@ class SNCTimer extends CountDownTimer {
 SNCTimer.actionsList = [];
 
 const joinToGroup = async ({
-    time,
-    url,
-    user,
-    onLoad
+    time, url, user, onload
 }) => {
     const group = new SteamGroup(url, user);
-    if (time === 0) { return group.join(); }
+    if (time === 0) return group.join();
     // Join to group
     await group.join();
-    onLoad();
+    if (onload) onload();
 
     const timer = new SNCTimer(time, { url });
     await timer.start();
@@ -58,25 +55,23 @@ const joinToGroup = async ({
 };
 
 const changeName = async ({
-    time,
-    newName,
-    onLoad,
-    user: { personaName }
+    time, newName, user: { personaName }, onload
 }) => {
     const steamSettings = new SteamSettings({ personaName: newName });
 
-    if (time === 0) { return steamSettings.send(); }
+    if (time === 0) return steamSettings.send();
 
-    if (!changeName.oldName) { changeName.oldName = personaName; }
-    if (changeName.timer) { changeName.timer.stop(); }
+    if (!changeName.oldName) changeName.oldName = personaName;
+    if (changeName.timer) changeName.timer.stop();
 
     const myTimer = new SNCTimer(time, { newName, oldName: changeName.oldName });
     myTimer.onTick(seconds => chrome.browserAction.setBadgeText({ text: seconds }));
     changeName.timer = myTimer;
 
     await steamSettings.send();
-    onLoad();
+    onload();
     await myTimer.start();
+
     // if we apply twice this func, code bellow will execute only once with first oldName
     if (!myTimer.stopped) {
         // return old username to steam
@@ -91,10 +86,11 @@ const changeName = async ({
 changeName.oldName = '';
 changeName.timer = null;
 
-const changeAvatar = async ({ blob, user, onLoad }) => {
+const changeAvatar = async ({ blob, user, onload }) => {
     if (blob.size < 1048576) {
-        await setAvatar(blob, user);
-        onLoad();
+        const images = await setAvatar(blob, user);
+        if (onload) onload();
+        return images;
     }
     return Promise.reject(new Error('MAX FILE SIZE'));
 };

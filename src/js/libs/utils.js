@@ -15,6 +15,8 @@ export const openInNewTab = (url) => {
     window.open(url, '_blank').focus();
 };
 
+export const isSteamGroup = url => /(https?:\/\/)?steamcommunity\.com\/groups\/[\s\S]+/i.test(url);
+
 // From https://github.com/lorenwest/node-config/blob/master/lib/config.js#L131-L152
 // export const getKey = (object, property) => {
 //     const elems = Array.isArray(property) ? property : property.split('.');

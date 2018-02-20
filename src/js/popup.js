@@ -1,11 +1,10 @@
-// steam settings додати до тегів
 import $ from 'jquery';
 import Clipboard from 'clipboard';
 // import parseTime from './libs/parse-time';
 import normalizeUrl from 'normalize-url';
 // import onetime from 'onetime';
 import { getNotificationCounts, getUserData } from './steam/user';
-import { openInNewTab } from './libs/utils';
+import { openInNewTab, isSteamGroup } from './libs/utils';
 import { localizeHTML } from './libs/localization';
 import { pushElement, removeElement, getElement } from './libs/storage';
 import { renderTemplatesTable, renderDonatePanel } from './libs/html-templates';
@@ -17,39 +16,14 @@ const saveTemplate = (type, value) => pushElement(`templates-${type}`, value);
 const removeTemplate = (type, index) => removeElement(`templates-${type}`, index);
 const getTemplate = (type, index) => getElement(`templates-${type}`, index);
 
+// TODO click on file input
+
 const start = (user) => {
     const {
         joinToGroup, changeName, changeAvatar, actionsList
     } = chrome.extension.getBackgroundPage().exports;
 
-    // const words = i18.localizeWords([
-    //     'minTime',
-    //     'Namelength',
-    //     'notGroup',
-    //     'minTime',
-    //     'newName',
-    //     'time',
-    //     'm',
-    //     's',
-    //     'myNameAndNew',
-    //     'andNew',
-    //     'group'
-    // ]);
-
     const audioVolume = 0.4;
-    const isSteamGroup = url => /(https?:\/\/)?steamcommunity\.com\/groups\/[\s\S]+/i.test(url);
-    // Time
-    // .valueAsNumber / 1000m
-
-    // const group = {
-    //     reg: /(https?:\/\/)?steamcommunity\.com\/groups\//i,
-    //     url: `${STEAM_URL}groups/`,
-    //     getUrl(url) {
-    //         return this.reg.test(url) ? url : this.url.concat(url);
-    //     }
-    // };
-
-    // const msToSeconds = ms => ms / 1000;
 
     onMessage((message) => {
         if (message.type === 'actions-list-updated') {
@@ -82,14 +56,12 @@ const start = (user) => {
             $image.attr('src', '/img/loading.gif');
             btnShowLoading($this);
 
-            const avatar = await changeAvatar({
+            const images = await changeAvatar({
                 blob: imageFile,
                 user,
-                onLoad: () => btnHideLoading($this)
+                onload: () => btnHideLoading($this)
             });
-
-            btnHideLoading($this);
-            $image.attr('src', avatar.medium);
+            $image.attr('src', images.medium);
 
             // save template
             if ($('#image-fieldset .js-save-field').is(':checked')) {
@@ -118,9 +90,8 @@ const start = (user) => {
                 time,
                 url,
                 user,
-                onLoad: () => btnHideLoading($this)
+                onload: () => btnHideLoading($this)
             });
-            console.log('Yess');
 
             // save template
             if ($('#group-fieldset .js-save-field').is(':checked')) {
@@ -154,7 +125,7 @@ const start = (user) => {
                 time,
                 newName,
                 user,
-                onLoad: () => btnHideLoading($this)
+                onload: () => btnHideLoading($this)
             });
         }
     });
@@ -175,6 +146,7 @@ const start = (user) => {
         $('.new-avatar img').attr('src', URL.createObjectURL(imageFile));
     };
 
+    // set template into fields
     $('#templates-panel').on('click', '.name tr, .group tr, .image tr', async function () {
         const type = $(this).parents('.table-wrapper table').attr('class');
         const index = $(this).index() - 1;
@@ -235,14 +207,12 @@ const start = (user) => {
     const renderTemplatesPanel = async (type) => {
         $('#templates-panel .table-wrapper').html(await renderTemplatesTable(type));
     };
-
     $('.tabs a[href="#templates-name"], .tabs a[href="#templates-image"], .tabs a[href="#templates-group"]')
         .click(function (e) {
             const type = this.hash.replace('#templates-', '');
             renderTemplatesPanel(type);
             e.preventDefault();
         });
-
     $('#templates-panel .table-wrapper').on('click', '.remove', async function (e) {
         e.stopPropagation();
         const index = $(this).parent('tr').index() - 1;
