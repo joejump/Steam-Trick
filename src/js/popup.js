@@ -3,12 +3,14 @@ import $ from 'jquery';
 import Clipboard from 'clipboard';
 // import parseTime from './libs/parse-time';
 import normalizeUrl from 'normalize-url';
-import onetime from 'onetime';
+// import onetime from 'onetime';
 import { getNotificationCounts, getUserData } from './steam/user';
 import { openInNewTab } from './libs/utils';
 import { localizeHTML } from './libs/localization';
 import { pushElement, removeElement, getElement } from './libs/storage';
 import { renderTemplatesTable, renderDonatePanel } from './libs/html-templates';
+import { on as onMessage } from './libs/messaging';
+
 // const STEAM_URL = 'https://steamcommunity.com/';
 
 const saveTemplate = (type, value) => pushElement(`templates-${type}`, value);
@@ -49,6 +51,13 @@ const start = (user) => {
 
     // const msToSeconds = ms => ms / 1000;
 
+    onMessage((message) => {
+        if (message.type === 'actions-list-updated') {
+            console.log(actionsList);
+            // TODO list
+        }
+    });
+
     const btnShowLoading = ($btn) => {
         $btn.prop('disabled', true)
             .addClass('btn-loading');
@@ -73,7 +82,11 @@ const start = (user) => {
             $image.attr('src', '/img/loading.gif');
             btnShowLoading($this);
 
-            const avatar = await changeAvatar({ blob: imageFile, user });
+            const avatar = await changeAvatar({
+                blob: imageFile,
+                user,
+                onLoad: () => btnHideLoading($this)
+            });
 
             btnHideLoading($this);
             $image.attr('src', avatar.medium);
@@ -101,18 +114,12 @@ const start = (user) => {
             const $this = $(this);
             btnShowLoading($this);
 
-            const hideLoading = onetime(() => btnHideLoading($this));
             await joinToGroup({
                 time,
                 url,
                 user,
-                onTick: (seconds, timer) => {
-                    console.log(seconds, timer);
-                    hideLoading();
-                }
+                onLoad: () => btnHideLoading($this)
             });
-
-            btnHideLoading($this);
             console.log('Yess');
 
             // save template
@@ -121,7 +128,6 @@ const start = (user) => {
                 console.log('saved Group');
             }
         }
-        // TODO list
     });
 
     $('#name-fieldset button').click(async function () {
@@ -144,17 +150,12 @@ const start = (user) => {
                 console.log('saved Name');
             }
 
-            const hideLoading = onetime(() => btnHideLoading($this));
             await changeName({
                 time,
                 newName,
                 user,
-                onTick: (seconds, timer) => {
-                    console.log(seconds, timer);
-                    hideLoading();
-                }
+                onLoad: () => btnHideLoading($this)
             });
-            // TODO list
         }
     });
 
@@ -299,33 +300,33 @@ getNotificationCounts()
         }
     });
 
-window.fillTemplates = () => {
-    const getRandomStr = (len) => {
-        let text = '';
-        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < len; i += 1) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        return text;
-    };
-    const getRandomNumb = max => ~~(Math.random() * max);
+// window.fillTemplates = () => {
+//     const getRandomStr = (len) => {
+//         let text = '';
+//         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+//         for (let i = 0; i < len; i += 1) {
+//             text += possible.charAt(Math.floor(Math.random() * possible.length));
+//         }
+//         return text;
+//     };
+//     const getRandomNumb = max => ~~(Math.random() * max);
 
-    saveTemplate('name', {
-        name: getRandomStr(getRandomNumb(32)),
-        time: getRandomNumb(3540),
-        andNew: !getRandomNumb(1)
-    });
+//     saveTemplate('name', {
+//         name: getRandomStr(getRandomNumb(32)),
+//         time: getRandomNumb(3540),
+//         andNew: !getRandomNumb(1)
+//     });
 
-    saveTemplate('group', {
-        url: getRandomStr(getRandomNumb(32)),
-        time: getRandomNumb(2000)
-    });
+//     saveTemplate('group', {
+//         url: getRandomStr(getRandomNumb(32)),
+//         time: getRandomNumb(2000)
+//     });
 
-    fetch('/img/128.png')
-        .then(res => res.blob())
-        .then((blob) => {
-            saveTemplate('image', {
-                blob
-            });
-        });
-};
+//     fetch('/img/128.png')
+//         .then(res => res.blob())
+//         .then((blob) => {
+//             saveTemplate('image', {
+//                 blob
+//             });
+//         });
+// };

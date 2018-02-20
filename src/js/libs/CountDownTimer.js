@@ -4,14 +4,16 @@ export default class CountDownTimer {
     constructor(duration, granularity = 500) {
         this.duration = duration;
         this.granularity = granularity;
+
         this.tickFtns = [];
         this.running = false;
     }
     start() {
-        // зробти шось
-        if (this.running) { Promise.reject(new Error('Timer has already started')); }
-        this.running = true;
+        if (this.running) {
+            return Promise.reject(new Error('Timer has already started'));
+        }
 
+        this.running = true;
         this._promise = new Promise((resolve) => {
             const start = Date.now();
             const timer = () => {
@@ -35,17 +37,8 @@ export default class CountDownTimer {
     }
     onTick(fun) {
         if (typeof fun === 'function') { this.tickFtns.push(fun); }
-        return this;
     }
     expired() {
         return !this.running;
-    }
-    setMoreTime(time) {
-        this.duration += time;
-        return this;
-    }
-    stop() {
-        this.duration = 0;
-        return this._promise;
     }
 }

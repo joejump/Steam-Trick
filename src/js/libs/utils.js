@@ -16,18 +16,18 @@ export const openInNewTab = (url) => {
 };
 
 // From https://github.com/lorenwest/node-config/blob/master/lib/config.js#L131-L152
-export const getKey = (object, property) => {
-    const elems = Array.isArray(property) ? property : property.split('.');
-    const name = elems[0];
-    const value = object[name];
+// export const getKey = (object, property) => {
+//     const elems = Array.isArray(property) ? property : property.split('.');
+//     const name = elems[0];
+//     const value = object[name];
 
-    if (elems.length <= 1) {
-        return value;
-    }
+//     if (elems.length <= 1) {
+//         return value;
+//     }
 
-    if (typeof value !== 'object') {
-        return undefined;
-    }
+//     if (typeof value !== 'object') {
+//         return undefined;
+//     }
 
-    return getKey(value, elems.slice(1));
-};
+//     return getKey(value, elems.slice(1));
+// };

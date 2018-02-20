@@ -2,28 +2,54 @@ import SteamGroup from './steam/SteamGroup';
 import SteamSettings from './steam/SteamSettings';
 import CountDownTimer from './libs/CountDownTimer';
 import setAvatar from './steam/set-avatar';
+import { send as sendMessage } from './libs/messaging';
 
 class SNCTimer extends CountDownTimer {
     constructor(time, mainProperties) {
         super(time);
-        super.onTick((seconds) => { this.propertyes.seconds = seconds; });
+        super.onTick((seconds) => {
+            this.propertyes.seconds = seconds;
+            sendMessage({ type: 'actions-list-updated' });
+        });
 
         this.propertyes = mainProperties;
     }
     async start() {
-        const index = SNCTimer.actionsList.push(this.propertyes) - 1;
+        const index = SNCTimer.actionsList.push(Object.assign(
+            this.propertyes,
+            { timer: this }
+        )) - 1;
+
         await super.start();
         SNCTimer.actionsList.splice(index, 1);
+    }
+    addMoreTime(time) {
+        this.duration += time;
+        return this.duration;
+    }
+    finish() {
+        this.duration = 0;
+        return this._promise;
+    }
+    stop() {
+        this.stopped = true;
+        return this.finish();
     }
 }
 // list of started actions
 SNCTimer.actionsList = [];
 
-const joinToGroup = async ({ time, url, user }) => {
+const joinToGroup = async ({
+    time,
+    url,
+    user,
+    onLoad
+}) => {
     const group = new SteamGroup(url, user);
     if (time === 0) { return group.join(); }
     // Join to group
     await group.join();
+    onLoad();
 
     const timer = new SNCTimer(time, { url });
     await timer.start();
@@ -31,30 +57,44 @@ const joinToGroup = async ({ time, url, user }) => {
     return group.leave();
 };
 
-const changeName = async ({ time, newName, user: { personaName } }) => {
+const changeName = async ({
+    time,
+    newName,
+    onLoad,
+    user: { personaName }
+}) => {
     const steamSettings = new SteamSettings({ personaName: newName });
 
-    if (time !== 0) { return steamSettings.send(); }
+    if (time === 0) { return steamSettings.send(); }
 
-    const timer = new SNCTimer(time, { newName });
-    timer.onTick(seconds => chrome.browserAction.setBadgeText({ text: seconds }));
+    if (!changeName.oldName) { changeName.oldName = personaName; }
+    if (changeName.timer) { changeName.timer.stop(); }
+
+    const myTimer = new SNCTimer(time, { newName, oldName: changeName.oldName });
+    myTimer.onTick(seconds => chrome.browserAction.setBadgeText({ text: seconds }));
+    changeName.timer = myTimer;
 
     await steamSettings.send();
-    await timer.start();
+    onLoad();
+    await myTimer.start();
+    // if we apply twice this func, code bellow will execute only once with first oldName
+    if (!myTimer.stopped) {
+        // return old username to steam
+        steamSettings.setNewSettings({ personaName: changeName.oldName });
+        changeName.oldName = '';
 
-    // return old username to steam
-    steamSettings.setNewSettings({ personaName });
-
-    const end = await steamSettings.send();
-    chrome.browserAction.setBadgeText({ text: '' });
-
-    return end;
+        await steamSettings.send();
+        chrome.browserAction.setBadgeText({ text: '' });
+    }
+    return Promise.resolve(myTimer);
 };
+changeName.oldName = '';
+changeName.timer = null;
 
-
-const changeAvatar = ({ blob, user }) => {
+const changeAvatar = async ({ blob, user, onLoad }) => {
     if (blob.size < 1048576) {
-        return setAvatar(blob, user);
+        await setAvatar(blob, user);
+        onLoad();
     }
     return Promise.reject(new Error('MAX FILE SIZE'));
 };
