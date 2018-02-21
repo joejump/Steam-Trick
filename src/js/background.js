@@ -1,8 +1,17 @@
+import OptionsSync from 'webext-options-sync';
 import SteamGroup from './steam/SteamGroup';
 import SteamSettings from './steam/SteamSettings';
 import CountDownTimer from './libs/CountDownTimer';
 import setAvatar from './steam/set-avatar';
 import { send as sendMessage } from './libs/messaging';
+
+// defaults options
+new OptionsSync().define({
+    defaults: {
+        imgFileInput: false,
+        audioVolume: '40'
+    }
+});
 
 class SNCTimer extends CountDownTimer {
     constructor(time, mainProperties) {

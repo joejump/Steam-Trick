@@ -1,0 +1,51 @@
+<style>
+    body {
+        min-width: 400px; /* Required to size the Browser Action popup */
+    }
+    #links-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+</style>
+<form id="options-form">
+    <p>
+        <label>
+            <input type="checkbox" name="imgFileInput">
+            File input for image
+        </label>
+    </p>
+    <p>
+        <label>
+            <input type="range" name="audioVolume">
+            Audio volume
+        </label>
+    </p>
+</form>
+<div id="links-container">
+    <div>
+        <a target="_blank" href="https://chrome.google.com/webstore/detail/steam-name-changer/mjapmfaiaogepjdpagcpalaijfngjljl">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAACi1BMVEUAskSGwp+Nmr2OmcCUnLKeoaqeoqWfn7WgoqWgo6WisrGlnqemq7ynpKKrpqOrqq23q6XjOELlNTrmNELmOT7mPEHmPULmPkPmP0TnUkKRwbgAt1OamqPjJkGbxbCfn5rmPkObm6HiHyWfqIjnP0K1trgAxV57n3DvOEHU1NXWExPY19jZe3Xb3t/g//9yk13S0NHIDxHUzdLlNDlTepq+rXjvjEXnOj4VvmnHrELYuVv2yzv2zD32zT/3z0D30UL40kP40kX7zi/78Ufc4vLrOUGodnYbqVbhu0XpU1cXZrHpP0QArULQmR8AR7IAszoNabYRb+0ankQrn148zIk9t/5Ag8JAh8xf0v+Gpa2Rz/Go1vKpJQCpvrivwF+zABa86dHCKC/IDBbKLjnSNj7TSWLUbHPXKADZISnZh4/aU1rbDRLbkprbnaLboqDdGA/dGUDgGR/hNDLhN2DiDxniKj3iLR/in6rjHxzkwMTldXnmMSnmQzbnPUHnQDPoP0PpEQjpQy7pSkzpnaDrw8bsvsHtABDtNz/tn6juQ0PvYU3vi0TvujLxnx3x8fHyUlPytQDzOkTzhYj0lJf0xcD047v09fX1sKr27/L4wLj47eL4///52vH556X6vUP6yCn6yC/6zDj61tT7wsP7xQD7yy/7zDD7zjj78vf79ff7/f/8zjL8zzP80Dr80Tv9ygD9ywD90TT90T790zb90zz91T79/f3+0Tv+00D+1D7+1EH+2AD+21j+8LX+8e7+9tv/zQD/zxj/0Cv/1SH/1kL/2ET/20j/3gD/4AD/4TP/6D3/6QD/6kf/7QX/8PL/9c//9tz/99z/+Nv/+Nz//f7//0b//+L///T////zWJOfAAAATnRSTlMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEEBQcJEhQVHygsQURHSFNTU1NTU1RUVVdfZ2dneo2PkaWlpaWlpaWpqa62ub3BxN7g+Pn5MujtAAABDUlEQVQY0wXBy0pCQRgA4H/+mTlOmrjooJBGZLiQbm5qFdEi6ELteoMeIGjVg0Sv0kMkiJs2mRiW5gXzctRz5jT/3/cJwfnUFrXDKUoGcJ7aWPelPEwOq/3fmSQAuX03chCH0dFpJfQIF6LyWIF6g7ohZs0szrxg1GlCSfYyRex+jPLnaURThOS1C24fLjPlK48U6s47pe4BYH83+FplJaLqcj6vl48BXA+BFfWJk1EwYQFEgllR4OV+DvbG3wWA2C1YJXxZde0dPbYeMBMjvTUsLZ8MD2AUW8s4eP1E6/70vAXAVifUZNrOrWW1HWqAuChCYYAMsp/1b07CSfO5BsYYs5JOyELprHaxifofHYx+TRRXt7wAAAAASUVORK5CYII=" />
+            <span>Chrome Web Store</span>
+        </a>
+    </div>
+    <!-- <div>
+        <a target="_blank" href="#">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAz5JREFUeNpcU0toXFUY/s49596588ikySSmM8rk0UkJEirVTVEjYk1NUdRFFgouXZQI2k2hUCjdiYIuCi4Kuig0DbqQYgU3Yi0iFRuRCBMwaZvMZDTNY95z3/fM8b8jldpzOeeee/i/737n+/+f4ZExf730rkiaZ9NJMx/nmk5HypMqqLr+ZuD4F67N5ZYejmfRsnvhyKsLhSs3zP70SubgYKHSdFENu+gXAprQIGnvBi5ez0m1b6u7M399+PTx+UvtCKtFi2F6195qXK2byir88esy5ksfYND5DhuhRCtUKBNB0Q7w5Z8ee2GgWdjOn250fn5v5j8F5dOHlZD0kWRgAwp3hrKY0S9BJWKIcQ5PShhNG4+1bHx+IocT+RXcrRSDMfFNRvvt3Oyp/icIrRhUl9hoO4kt3F55Bxf3LkLV20jWOohbDjzXxyc/lMH0cRSyCd1xq+dFhu986t7T0CUwIzB8EkW3O5ibhj44ib7NJhiBKRoB/aS4ZWHjbxtjGQYP7nGRTjim1SaQqYiAVAREpHG8vzWJn+6PQ6CF0HPR7nQQczpYeEWHyWMUkwU8MSECGwgJxAWp9xWKNzkuH3oet+JDlIE9Momedh1G4CN0bfhVG9nsS0BQQthJx0V7j3elq7ihqV5ezQTwZmodP9ZGkU/bOPr4Nr53xtDYsaD7Dg4nNqFaH5OCYSSdGhf7daNmuv6wEKqXk/yExKGBHSznFsH6FFpKQ/JAA0ulUejWLt44lkHXsqDaX6C6Nl4Rnq8vK8s/KThDMlJhkI91YOO+iR3XwEelCdTCBLSgijNzd6DLNfhlHfZ6FtWiWBQpq/V2LdSrrNPljBQkoOjuCiPxAMutOIbkPqYSEqeequGZaTLzdhZhS0PlnlB9bvhtr5CuHj3y2Qj8hVQ/kEopxONEEsO/0yATDYXYAdWrE69JEElXq7Hyk0tro+xBU1yZmr4xrIcvptIRCZlJJAYBmRGRkD08aivA7VDvWPqt564Xn41w/AHB1/u7l1/uGxGU8mNcgodUNDIq0JDeLnpzc1uo1Qr76rWbqyf/142PjsXJqdkmN2YDnQ9oGkJNU+t57q7qUv4y9/t64+HYfwQYAN7OczrzUDvGAAAAAElFTkSuQmCC" />
+            <span>Firefox Add-ons</span>
+        </a>
+    </div>
+    <div>
+        <a target="_blank" href="#">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAACl1BMVEUAAAAAADoAAFUAAFcAAF4AAGIAAP8ABQMABQYAEu4AU60AU68AVKkAVKsBBDwBDhoBFSQBF+gFWKUGWacHFioHFywHFzUHFzYHNrILGS4LHDIMY5sNYZgPSq8PSrURXoYSbqITa6kGF0MAG1YGGT4OGi4RSHoOGS4Sea4TeLEQHDAMHTcPHC0DGDQHGUkMHS4Tga8HSY0TfrEVd5h1jaQCEikVbaAFFkUVPG8VWIYHGDEFFjYTW50RX5UQHC8QHTATgLITgbIAACv///8IGEMTL2UQHC8QHC8TgLL///9ebIsNIVERKFsAABQAABgAABoAABsAACMAACUAACgAAC0AADAAAjwAAyMABDYACSMACS8ACyoAC0AADEgADygADz8AD0UAFlMAF0oAIlwAKlYAL2kAOnQAV5EAXJQAYZcBNm4BVXwCOGcDEywFE0IFGDkFGz0FUYgGGT0GGT4HGT4HGkAIGTYIGjYIGkIIGkMIHDoIMmgJGkIJHDsKG0gKG0wKHUULHEkLHUoMGzIMGzMMHDUOHjsOJloQKF0QLWISXpETXpETbZ8TbaATbqATcKIUO28UPHAUR3oUSHoUUoUUUoYUbqAVM2UVR3kVR3oVVIcVYY8WUoYXS30dJkYjNWUqOlQsbpw3Z5U/SGFAfaZDZI9MW4FMXohOhKtPfKJdZn9jbo1reZlujKxyeYx7haJ8iJ98kK2BiaWCjKWQkqKRmaqTlJqTnbGVnK6VnbGqtsuqucurscGssr+ww9SxvM61usa2uL65vsu7xtXB0N3D0d7JzdXJzdbJ0t7Kz9jLz9jM0NrM097R0dfS0t3S1dvS1dzT2OLW2eHW3+jX19/e4Ojs7vHw8vXz9vn4+fv9/fz+///////Hb3moAAAATXRSTlMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKSswMzM1OTyQkpOUlpeXmZmZm5ydn6KiusDAxs3P0tPX2tvd7u/v8/T19QHYeV8AAAEWSURBVBjTBcHPSgJBGADw75tvZmdcNTRdCkG0vwcpiCzw1q1DgXToEPQUPU+HoFMde4FeoEsSUVhRKZGFtru66o7ruP1+COCIpMgrDHtR33SRA8TZEwTATlc0OgxJio3DkZ6Ye7MvBwk3pPTSXmiMaR4f2ZvlVyugQh0ZYz8Htd6oX3E6PktJblnpYN4N17OtUpRj+bYt1J9YjhBEjCzNVflBWu6pzd+eaaXBJa2eFRc/6lUgR6RerrfafCIrZtdtF2HY/HyszmnuexmifLM7uJoVdkAPKDHEnKD4+8aqSVD8lqSrpfiNg/dtjUxceGQCNrUj/66kp9Pk5VPEzbA1ns1wLTFieP4VIlqwQEplFGh/HEYe/gM/5nCaRAa8QAAAAABJRU5ErkJggg==" />
+            <span>Steam Group</span>
+        </a>
+    </div> -->
+    <div>
+        <a target="_blank" href="https://github.com/meyson/SteamNameChanger">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABaElEQVR42o1TsUrEQBTcU0/kMJjc7ts0gv6AoI0otpbif1j6E9oJgh4IIsjZW/kFIlxhZXkiV2htr5dTZ3KbuMkZcwsv7M6bmd23eatUaWitN8XIpRX7Yo0kaWBOjDlVNURk0YpcQ/AVi/3+K5gjh9xJsTG9KuGkkekVTAB03Q6PVusD7PLkjv/mIkkx5sBxJt1U3G63t36d7YXznEW0vEO2HKbIyfjUqljLVW6g5UzVDHLycqBVmAyyC4Ljcp0BOd5FDxTrcwbvaspBrtMkXAzdYohccwp9s6DBp5/VZIzZq1OT4/VFn7+w4wGvEsr6P822QY7XDx0VRdEawBEWJ4ib8VzucVnbec1RtIM+eGDO22xE7dhZyylB9PouiOf417dILmUGQRCYcjdS459uHo/lDuJn1LjvHs2Ml18oiMGlplziHGo8io18kERR2QDH/oxFjsmtvOUwDFdiYw4xbXhwgxhyq2X+D0DfkehGi3CbAAAAAElFTkSuQmCC" />
+            <span>Github Page</span>
+        </a>
+    </div>
+</div>
+<script src="../js/options.js"></script>

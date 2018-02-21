@@ -1,16 +1,14 @@
 import $ from 'jquery';
 import Clipboard from 'clipboard';
-// import parseTime from './libs/parse-time';
 import normalizeUrl from 'normalize-url';
-// import onetime from 'onetime';
+import OptionsSync from 'webext-options-sync';
 import { getNotificationCounts, getUserData } from './steam/user';
 import { openInNewTab, isSteamGroup } from './libs/utils';
 import { localizeHTML } from './libs/localization';
 import { pushElement, removeElement, getElement } from './libs/storage';
 import { renderTemplatesTable, renderDonatePanel } from './libs/html-templates';
 import { on as onMessage } from './libs/messaging';
-
-// const STEAM_URL = 'https://steamcommunity.com/';
+// import parseTime from './libs/parse-time';
 
 const saveTemplate = (type, value) => pushElement(`templates-${type}`, value);
 const removeTemplate = (type, index) => removeElement(`templates-${type}`, index);
@@ -18,12 +16,12 @@ const getTemplate = (type, index) => getElement(`templates-${type}`, index);
 
 // TODO click on file input
 
-const start = (user) => {
+const start = (user, options) => {
     const {
         joinToGroup, changeName, changeAvatar, actionsList
     } = chrome.extension.getBackgroundPage().exports;
 
-    const audioVolume = 0.4;
+    const audioVolume = options.audioVolume / 100;
 
     onMessage((message) => {
         if (message.type === 'actions-list-updated') {
@@ -253,8 +251,8 @@ const waitDocument = () => new Promise(resolve => $(resolve));
 
 // Get data and to start an application
 getNotificationCounts()
-    .then(() => Promise.all([getUserData(), waitDocument()]))
-    .then(([user]) => {
+    .then(() => Promise.all([getUserData(), new OptionsSync().getAll(), waitDocument()]))
+    .then(([user, options]) => {
         localizeHTML(document.getElementById('unlocalizedPage').textContent, 'body');
         // fill page with data
         fillPage(user);
@@ -262,7 +260,7 @@ getNotificationCounts()
         // hide animation
         $('body').addClass('loaded');
 
-        start(user);
+        start(user, options);
     })
     .catch((error) => {
         if (error.statusText === 'Unauthorized') {

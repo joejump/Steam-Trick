@@ -44,28 +44,14 @@ module.exports = (env) => {
     return {
         entry: {
             'js/popup': './src/js/popup',
-            'js/background': './src/js/background'
+            'js/background': './src/js/background',
+            'js/options': './src/js/options'
         },
         output: {
             path: path.join(__dirname, DIST_FOLDER),
             filename: '[name].js'
         },
         devtool: 'source-map',
-        // module: {
-        //     rules: [
-        //         {
-        //             test: /\.js$/, // для яких пряцюють модулі
-        //             exclude: /node_modules/,
-        //             // loader: 'babel-loader'
-        //             use: [
-        //                 {
-        //                     loader: ''// який лоадер
-        //                 }
-        //             ] // лоадери які будуть працювіати над JS
-
-        //         }
-        //     ]
-        // },
         // const exclude = ['!node_modules{,/**}', '!dist{,/**}'];
         plugins: [
             new CleanWebpackPlugin([DIST_FOLDER]),
@@ -76,21 +62,3 @@ module.exports = (env) => {
         ]
     };
 };
-
-// if (IS_PRODUCTION) {
-//     module.exports.plugins.push(new UglifyJSPlugin({
-//         uglifyOptions: {
-//             // Keep it somewhat readable for AMO reviewers
-//             mangle: false,
-//             compress: false,
-//             output: {
-//                 beautify: true,
-
-//                 // Reduce beautification indentation from 4 spaces to 1 to save space
-//                 indent_level: 2 // eslint-disable-line camelcase
-//             }
-//         }
-//     }));
-// } else {
-//     module.exports.
-// }

@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Steam Name Changer",
-    "version": "1.2.0.3",
+    "version": "0",
     "description": "__MSG_description__",
     "icons": {
         "16": "img/16.png",
@@ -27,5 +27,9 @@
         "default_icon": "img/48.png",
         "default_popup": "html/popup.html"
     },
-    "short_name": "SNC"
+    "short_name": "SNC",
+	"options_ui": {
+		"chrome_style": true,
+		"page": "html/options.html"
+	}
 }
