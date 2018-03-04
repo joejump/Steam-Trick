@@ -2,6 +2,8 @@
 <title>Steam Name Changer</title>
 <link rel="stylesheet" type="text/css" href="../css/style.css">
 <script type="text/html" id="unlocalizedPage">
+
+
     <header class="header">
         <div class="user">
             <div class="avatar">
@@ -35,84 +37,91 @@
     </header>
     <main class="panels">
         <div id="main-panel" class="panel active">
+
             <fieldset id="name-fieldset">
-                <div class="checkbox-wp">
+                <ul class="feature">
+                    <li>
+                        <label class="switch toggle-time">
+                            <input class="js-duration" type="checkbox" checked>
+                            <span class="slider round"></span>
 
-                    <label class="switch time-duration">
-                        <input class="js-duration" type="checkbox" checked>
-                        <span class="slider round"></span>
-                        <div class="text">
-                            <em>__MSG_time__</em>
-                        </div>
-                        
-                        <input type="time" title="MM:SS" step="1" value="00:01">
-                    </label>
+                            <em class="text">__MSG_time__</em>
+                            <input type="time" step="1" value="00:01">
+                        </label>
+                    </li>
+                    <li>
+                        <label class="container">
+                            <input class="js-add-old-name" type="checkbox">
+                            <span class="checkmark"></span>
+                            <span class="text">+</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="container">
+                            <input class="js-save" type="checkbox">
+                            <span class="checkmark"></span>
+                            <span class="text">__MSG_save__</span>
+                        </label>
+                    </li>
+                </ul>
 
-                    <label class="container">
-                        <input class="js-add-old-name" type="checkbox">
-                        <span class="checkmark"></span>
-                        <span class="text">+</span>
-                    </label>
-
-                    <label class="container">
-                        <input class="js-save-field" type="checkbox">
-                        <span class="checkmark"></span>
-                        <em class="text">__MSG_save__</em>
-                    </label>
-                </div>
-
-                <input type="text" class="progress-icon js-field" placeholder="__MSG_newName__" maxlength="32">
-                <div class="btn-wp right">
-                    <button class="btn btn-slide-top" type="button">
-                        <span>__MSG_change__</span>
-                    </button>
+                <div class="field">
+                    <input type="text" class="js-field" placeholder="__MSG_newName__" maxlength="32"
+                        title="Use 'Enter' to submit form">
+                    <button></button>
                 </div>
             </fieldset>
+
             <fieldset id="group-fieldset">
-                <div class="checkbox-wp">
-                    <label class="switch time-duration">
-                        <input class="js-duration" type="checkbox" checked>
-                        <span class="slider round"></span>
-                        <div class="text">
-                            <em>__MSG_time__</em>
-                        </div>
-                        <input type="time" title="MM:SS" step="1" value="00:01">
-                    </label>
+                <ul class="feature">
+                    <li>
+                        <label class="switch toggle-time">
+                            <input class="js-duration" type="checkbox" checked>
+                            <span class="slider round"></span>
 
-                    <label class="container">
-                        <input class="js-save-field" type="checkbox">
-                        <span class="checkmark"></span>
-                        <em class="text">__MSG_save__</em>
-                    </label>
-                </div>
-                <input type="text" class="progress-icon js-field" placeholder="__MSG_groupUrl__">
-                <div class="btn-wp right">                        
-                    <button class="btn btn-slide-top" type="button">
-                        <span>__MSG_groupBtn__</span>
-                    </button>
+                            <em class="text">__MSG_time__</em>
+                            <input type="time" step="1" value="00:01">
+                        </label>
+                    </li>
+                    <li>
+                        <label class="container">
+                            <input class="js-save" type="checkbox">
+                            <span class="checkmark"></span>
+                            <span class="text">__MSG_save__</span>
+                        </label>
+                    </li>
+                </ul>
+                <div class="field">
+                    <input type="text" class="js-field" placeholder="__MSG_groupUrl__" maxlength="32"
+                        title="Use 'Enter' to submit form" >
+                    <button></button>
                 </div>
             </fieldset>
+
             <fieldset id="image-fieldset">
-                <div class="checkbox-wp right">
-                    <label class="container">
-                        <input class="js-save-field" type="checkbox">
-                        <span class="checkmark"></span>
-                        <em class="text">__MSG_save__</em>
-                    </label>
-                </div>
-                <div class="center new-avatar">
-                    <img src="img/loading.gif" alt="Avatar">
-                    <input type="file" accept="image/*" class="js-field">
-                </div>
-                <div class="btn-wp right">
-                    <button class="btn btn-slide-top" type="button">
-                        <span>Upload</span>
-                    </button>
+                <ul class="feature">
+                    <li>
+                        <label class="container">
+                            <input class="js-save-field" type="checkbox">
+                            <span class="checkmark"></span>
+                            <em class="text">__MSG_save__</em>
+                        </label>
+                    </li>
+                </ul>
+                <div class="wp">
+                    <img class="preview" src="img/loading.gif" alt="Avatar">
+                    <div class="field">
+                        <div>
+                            <input type="file" accept="image/*" class="js-field">
+                        </div>
+                        <button></button>
+                    </div>
                 </div>
             </fieldset>
+
         </div>
         <div id="templates-panel" class="panel">
-            <div class="table-wrapper"></div>
+            <div class="templates"></div>
         </div>
         <div id="donate-panel" class="panel">
             <div class="donate-wrapper">
@@ -131,10 +140,7 @@
             <span class="remove"></span>
         </div>
     </main>
-    <!-- <footer>
-        <button class="btn"></button>
-    </footer> -->
-    <ul class="state-list" id="state"></ul>
+
 </script>
 <script type="text/javascript" src="../js/popup.js"></script>
 
@@ -143,5 +149,4 @@
         <div class="loader"></div>
         <div class="loader-section"></div>
     </div>
-    <!-- <div class="error-message"></div> -->
 </body>

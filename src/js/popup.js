@@ -43,12 +43,12 @@ const start = (user, options) => {
     let imageFile = null;
     $('#image-fieldset input[type="file"]').change(function () {
         [imageFile] = this.files;
-        $('.new-avatar img').attr('src', URL.createObjectURL(imageFile));
+        $('.preview').attr('src', URL.createObjectURL(imageFile));
     });
 
     $('#image-fieldset button').click(async function () {
         if (imageFile) {
-            const $image = $('.user .avatar img, .new-avatar img');
+            const $image = $('.user .avatar img, .preview');
             const $this = $(this);
 
             $image.attr('src', '/img/loading.gif');
@@ -62,7 +62,7 @@ const start = (user, options) => {
             $image.attr('src', images.medium);
 
             // save template
-            if ($('#image-fieldset .js-save-field').is(':checked')) {
+            if ($('#image-fieldset .js-save').is(':checked')) {
                 saveTemplate('image', { blob: imageFile });
             }
         }
@@ -92,7 +92,7 @@ const start = (user, options) => {
             });
 
             // save template
-            if ($('#group-fieldset .js-save-field').is(':checked')) {
+            if ($('#group-fieldset .js-save').is(':checked')) {
                 saveTemplate('group', { url, time });
                 console.log('saved Group');
             }
@@ -110,7 +110,7 @@ const start = (user, options) => {
             const $this = $(this);
             btnShowLoading($this);
 
-            if ($('#name-fieldset .js-save-field').is(':checked')) {
+            if ($('#name-fieldset .js-save').is(':checked')) {
                 saveTemplate('name', {
                     name: newName,
                     time,
@@ -141,7 +141,7 @@ const start = (user, options) => {
 
     const setImageTpl = ({ blob }) => {
         imageFile = blob;
-        $('.new-avatar img').attr('src', URL.createObjectURL(imageFile));
+        $('.preview').attr('src', URL.createObjectURL(imageFile));
     };
 
     // set template into fields
@@ -244,14 +244,16 @@ const fillPage = (user) => {
 
     $('.user .state-message').html(user.stateMessage);
     $('.user .id64 button').attr('data-clipboard-text', user.id64);
-    $('.user .avatar img, .new-avatar img').attr('src', user.avatar);
+    $('.user .avatar img, .preview').attr('src', user.avatar);
 };
 
 const waitDocument = () => new Promise(resolve => $(resolve));
 
 // Get data and to start an application
 getNotificationCounts()
-    .then(() => Promise.all([getUserData(), new OptionsSync().getAll(), waitDocument()]))
+
+    // TODO: firefox sync storage error
+    .then(() => Promise.all([getUserData(), /* new OptionsSync().getAll(), */waitDocument()]))
     .then(([user, options]) => {
         localizeHTML(document.getElementById('unlocalizedPage').textContent, 'body');
         // fill page with data
