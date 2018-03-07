@@ -28,7 +28,7 @@
               <ul class="sub">
                 <li><a href="#templates-name">Names</a></li>
                 <li><a href="#templates-group">Groups</a></li>
-                <li><a href="#templates-image">Images</a></li>
+                <!-- <li><a href="#templates-image">Images</a></li> -->
               </ul>
             </li>
             <li class="tab"><a href="#donate-panel">__MSG_donateTab__</a></li>
@@ -42,11 +42,11 @@
                 <ul class="feature">
                     <li>
                         <label class="switch toggle-time">
-                            <input class="js-duration" type="checkbox" checked>
+                            <input class="js-has-time" type="checkbox" checked>
                             <span class="slider round"></span>
 
                             <em class="text">__MSG_time__</em>
-                            <input type="time" step="1" value="00:01">
+                            <input type="time" step="1" value="00:01:00" min="00:00:10">
                         </label>
                     </li>
                     <li>
@@ -66,21 +66,20 @@
                 </ul>
 
                 <div class="field">
-                    <input type="text" class="js-field" placeholder="__MSG_newName__" maxlength="32"
-                        title="Use 'Enter' to submit form">
+                    <input type="text" class="js-field" placeholder="__MSG_newName__" 
+                        maxlength="32" minlength="2" title="Must be between 2 and 32 characters in length.">
                     <button></button>
                 </div>
             </fieldset>
-
             <fieldset id="group-fieldset">
                 <ul class="feature">
                     <li>
                         <label class="switch toggle-time">
-                            <input class="js-duration" type="checkbox" checked>
+                            <input class="js-has-time" type="checkbox" checked>
                             <span class="slider round"></span>
 
                             <em class="text">__MSG_time__</em>
-                            <input type="time" step="1" value="00:01">
+                            <input type="time" step="1" value="00:01:00" min="00:00:10">
                         </label>
                     </li>
                     <li>
@@ -92,13 +91,14 @@
                     </li>
                 </ul>
                 <div class="field">
-                    <input type="text" class="js-field" placeholder="__MSG_groupUrl__" maxlength="32"
-                        title="Use 'Enter' to submit form" >
+                    <input type="text" class="js-field" placeholder="__MSG_groupUrl__" 
+                        title="__MSG_groupUrl__"
+                        pattern="(https?:\/\/)?steamcommunity\.com\/groups\/[\s\S]+" >
                     <button></button>
                 </div>
             </fieldset>
 
-            <fieldset id="image-fieldset">
+            <!-- <fieldset id="image-fieldset">
                 <ul class="feature">
                     <li>
                         <label class="container">
@@ -111,13 +111,12 @@
                 <div class="wp">
                     <img class="preview" src="img/loading.gif" alt="Avatar">
                     <div class="field">
-                        <div>
-                            <input type="file" accept="image/*" class="js-field">
-                        </div>
-                        <button></button>
+                        <input type="file" accept="image/*"
+                            title="Image will be uploaded automatically" class="js-field">
+                            <button></button>
                     </div>
                 </div>
-            </fieldset>
+            </fieldset> -->
 
         </div>
         <div id="templates-panel" class="panel">

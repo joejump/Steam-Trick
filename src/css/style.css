@@ -14,8 +14,8 @@ ul {
 }
 a { text-decoration: none; }
 body {
-    max-width: 410px;
-    max-height: 600px;
+    height: 350px;
+    width: 410px;
     overflow: hidden;
     font-family: var(--main-font);
     font-size: 14px;
@@ -295,6 +295,10 @@ nav.tabs {
 .user .info .id64 * {
     cursor: pointer;
 }
+.id64 > button {
+    background-color: inherit;
+    color: #000;
+} 
 .user .info .username {
     font-size: 25px;
 }
@@ -400,19 +404,22 @@ nav.tabs {
     visibility: visible;
 }
 
-#image-fieldset .field {
-    margin: 0
+/* #image-fieldset .field {
+    margin: 0;
+    align-items: center;
 }
 #image-fieldset .wp {
     height: 64px;
 }
-#image-fieldset input[type="file"] {
-    height: 100%;
-}
+.preview {
+    width: 64px;
+    object-fit: contain;
+} */
+
 
 /*Panel 2*/
 .templates {
-    max-height: 460px;
+    max-height: 230px;
     overflow: auto;
 }
 .templates table {

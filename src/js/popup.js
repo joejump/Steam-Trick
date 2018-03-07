@@ -3,7 +3,7 @@ import Clipboard from 'clipboard';
 import normalizeUrl from 'normalize-url';
 import OptionsSync from 'webext-options-sync';
 import { getNotificationCounts, getUserData } from './steam/user';
-import { openInNewTab, isSteamGroup } from './libs/utils';
+import { openInNewTab } from './libs/utils';
 import { localizeHTML } from './libs/localization';
 import { pushElement, removeElement, getElement } from './libs/storage';
 import { renderTemplatesTable, renderDonatePanel } from './libs/html-templates';
@@ -18,7 +18,7 @@ const getTemplate = (type, index) => getElement(`templates-${type}`, index);
 
 const start = (user, options) => {
     const {
-        joinToGroup, changeName, changeAvatar, actionsList
+        joinToGroup, changeName, actionsList // , changeAvatar
     } = chrome.extension.getBackgroundPage().exports;
 
     const audioVolume = options.audioVolume / 100;
@@ -40,128 +40,134 @@ const start = (user, options) => {
             .removeClass('btn-loading');
     };
 
-    let imageFile = null;
-    $('#image-fieldset input[type="file"]').change(function () {
-        [imageFile] = this.files;
-        $('.preview').attr('src', URL.createObjectURL(imageFile));
-    });
+    // let imageFile = null;
+    // const uploadImage = async () => {
+    //     if (imageFile) {
+    //         const $image = $('.user .avatar img, .preview');
+    //         const $btn = $('#image-fieldset button');
 
-    $('#image-fieldset button').click(async function () {
-        if (imageFile) {
-            const $image = $('.user .avatar img, .preview');
-            const $this = $(this);
+    //         $image.attr('src', '/img/loading.gif');
+    //         btnShowLoading($btn);
 
-            $image.attr('src', '/img/loading.gif');
-            btnShowLoading($this);
+    //         const images = await changeAvatar({
+    //             blob: imageFile,
+    //             user,
+    //             onload: () => btnHideLoading($btn)
+    //         });
+    //         $image.attr('src', images.medium);
 
-            const images = await changeAvatar({
-                blob: imageFile,
-                user,
-                onload: () => btnHideLoading($this)
-            });
-            $image.attr('src', images.medium);
+    //         // save template
+    //         if ($('#image-fieldset .js-save').is(':checked')) {
+    //             saveTemplate('image', { blob: imageFile });
+    //         }
+    //     }
+    // };
 
-            // save template
-            if ($('#image-fieldset .js-save').is(':checked')) {
-                saveTemplate('image', { blob: imageFile });
-            }
+    // $('#image-fieldset button').click(uploadImage);
+    // $('#image-fieldset input[type="file"]').change(function () {
+    //     [imageFile] = this.files;
+    //     $('.preview').attr('src', URL.createObjectURL(imageFile));
+
+    //     if (true) {
+    //         uploadImage();
+    //     }
+    // });
+    const getTime = (selector) => {
+        const time = $(`${selector} input[type=time]`).get(0).valueAsNumber / 1000;
+        return $(`${selector} .js-has-time`).is(':checked') ? time : 0;
+    };
+    const checkTime = (selector, time) => {
+        if (Number.isNaN(time) || (time < 10 && time !== 0)) {
+            const input = $(`${selector} input[type=time]`)[0];
+            input.reportValidity();
+            return false;
         }
-    });
+        return true;
+    };
 
     $('#group-fieldset button').click(async function () {
-        // TODO without time
-        const time = $('#group-fieldset input[type=time]').get(0).valueAsNumber / 1000;
-        const value = $('#group-fieldset .js-field').val();
-        const url = normalizeUrl(value, {
-            removeQueryParameters: [/[\s\S]+/i]
-        });
+        const $field = $('#group-fieldset .js-field');
+        const url = normalizeUrl($field.val(), { removeQueryParameters: [/[\s\S]+/i] });
+        const time = getTime('#group-fieldset');
 
-        if (Number.isNaN(time) || time < 10) {
-            console.log('bad time');
-        } else if (!isSteamGroup(url)) {
-            console.log('not a grouopppp');
-        } else {
+        if (checkTime('#group-fieldset', time) && $field[0].reportValidity()) {
+            // save template
+            if ($('#group-fieldset .js-save').is(':checked')) {
+                saveTemplate('group', { url, time });
+            }
+
             const $this = $(this);
             btnShowLoading($this);
-
             await joinToGroup({
                 time,
                 url,
                 user,
-                onload: () => btnHideLoading($this)
+                onload: () => {
+                    btnHideLoading($this);
+                }
             });
-
-            // save template
-            if ($('#group-fieldset .js-save').is(':checked')) {
-                saveTemplate('group', { url, time });
-                console.log('saved Group');
-            }
         }
     });
 
     $('#name-fieldset button').click(async function () {
-        // TODO without time
-        const time = $('#name-fieldset input[type=time]').get(0).valueAsNumber / 1000;
-        const newName = $('#name-fieldset .js-field').val();
+        const andNew = $('#name-fieldset .js-add-old-name').is(':checked');
+        const time = getTime('#name-fieldset');
+        const $field = $('#name-fieldset .js-field');
 
-        if (newName.length < 2 || newName.length > 32) {
-            console.log('Bad langth!');
-        } else {
-            const $this = $(this);
-            btnShowLoading($this);
+        if (checkTime('#name-fieldset', time) && $field[0].reportValidity()) {
+            const name = $field.val();
 
+            // save template
             if ($('#name-fieldset .js-save').is(':checked')) {
-                saveTemplate('name', {
-                    name: newName,
-                    time,
-                    andNew: $('#name-fieldset .js-add-old-name').is(':checked')
-                });
-                console.log('saved Name');
+                saveTemplate('name', { name, time, andNew });
             }
 
+            // TODO
+            const newName = andNew ? `${user.personaName} ${name}` : name;
+            const $this = $(this);
+            btnShowLoading($this);
             await changeName({
                 time,
-                newName,
                 user,
+                newName,
                 onload: () => btnHideLoading($this)
             });
         }
     });
 
+    // If time is 0 we want to hide time input
+    const setTime = (element, time) => {
+        $(`${element} .js-has-time`).prop('checked', time !== 0);
+        $(`${element} input[type=time]`).get(0).valueAsNumber = time * 1000;
+    };
+
     const setNameTpl = ({ name, time, andNew }) => {
-        $('#name-fieldset .js-field').val(name);
+        setTime('#name-fieldset', time);
         $('#name-fieldset .js-add-old-name').prop('checked', andNew);
-        $('#name-fieldset input[type=time]').get(0).valueAsNumber = time * 1000;
+        $('#name-fieldset .js-field').val(name);
     };
 
     const setGroupTpl = ({ url, time }) => {
+        setTime('#group-fieldset', time);
         $('#group-fieldset .js-field').val(url);
-        $('#group-fieldset input[type=time]').get(0).valueAsNumber = time * 1000;
     };
 
-    const setImageTpl = ({ blob }) => {
-        imageFile = blob;
-        $('.preview').attr('src', URL.createObjectURL(imageFile));
-    };
+    // const setImageTpl = ({ blob }) => {
+    //     imageFile = blob;
+    //     $('.preview').attr('src', URL.createObjectURL(imageFile));
+    // };
 
-    // set template into fields
-    $('#templates-panel').on('click', '.name tr, .group tr, .image tr', async function () {
-        const type = $(this).parents('.table-wrapper table').attr('class');
+    // fill inputs
+    $('#templates-panel').on('click', '.name tr, .group tr', async function () {
+        const type = $(this).parents('.templates table').attr('class');
         const index = $(this).index() - 1;
         const tpl = await getTemplate(type, index);
 
         if (type === 'name') { setNameTpl(tpl); }
         if (type === 'group') { setGroupTpl(tpl); }
-        if (type === 'image') { setImageTpl(tpl); }
+        // if (type === 'image') { setImageTpl(tpl); }
         $('a[href="#main-panel"]').trigger('click');
     });
-
-    // joinToGroup({
-    //     time: 60,
-    //     url: 'https://steamcommunity.com/groups/Natus-Vincere',
-    //     user: {profileURL: 'https://steamcommunity.com/id/Terminator_UA_/'},
-    //     onTick: console.log
-    // }).then(() => console.log('END'))
 
     const clipboard = new Clipboard('.id64 button');
 
@@ -203,18 +209,18 @@ const start = (user, options) => {
     });
 
     const renderTemplatesPanel = async (type) => {
-        $('#templates-panel .table-wrapper').html(await renderTemplatesTable(type));
+        $('#templates-panel .templates').html(await renderTemplatesTable(type));
     };
-    $('.tabs a[href="#templates-name"], .tabs a[href="#templates-image"], .tabs a[href="#templates-group"]')
+    $('.tabs a[href="#templates-name"], .tabs a[href="#templates-group"]')
         .click(function (e) {
             const type = this.hash.replace('#templates-', '');
             renderTemplatesPanel(type);
             e.preventDefault();
         });
-    $('#templates-panel .table-wrapper').on('click', '.remove', async function (e) {
+    $('#templates-panel .templates').on('click', '.remove', async function (e) {
         e.stopPropagation();
         const index = $(this).parent('tr').index() - 1;
-        const type = $(this).parents('.table-wrapper table').attr('class');
+        const type = $(this).parents('.templates table').attr('class');
 
         const templates = await removeTemplate(type, index);
         renderTemplatesPanel(type, templates);
@@ -292,11 +298,11 @@ getNotificationCounts()
 //         time: getRandomNumb(2000)
 //     });
 
-//     fetch('/img/128.png')
-//         .then(res => res.blob())
-//         .then((blob) => {
-//             saveTemplate('image', {
-//                 blob
-//             });
-//         });
+//     // fetch('/img/128.png')
+//     //     .then(res => res.blob())
+//     //     .then((blob) => {
+//     //         saveTemplate('image', {
+//     //             blob
+//     //         });
+//     //     });
 // };

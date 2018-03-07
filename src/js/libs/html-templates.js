@@ -20,14 +20,19 @@ export const renderTemplatesTable = async (type, data) => {
         iterate = ({ url, time }) => {
             table += `<tr><td>${url}</td><td>${parseTime(time)}</td>${removing}</tr>`;
         };
-    } else if (type === 'image') {
-        table += `<tr><th>Image</th><th>Name</th><th>Size</th><th class="symbol">${REMOVE_SYMBOL}</th></tr>`;
-        iterate = ({ blob }) => {
-            const src = URL.createObjectURL(blob);
-            const { name, size } = blob;
-            table += `<tr><td><img src=${src}></td><td>${name}</td><td>${size / 1000}kb</td>${removing}</tr>`;
-        };
     }
+
+    // else if (type === 'image') {
+    //     table += `<tr><th>Image</th><th>Name</th>
+    //               <th>Size</th><th class="symbol">${REMOVE_SYMBOL}</th></tr>`;
+    //     iterate = ({ blob }) => {
+    //         const src = URL.createObjectURL(blob);
+    //         const { name, size } = blob;
+    //         table += `<tr><td><img src=${src}></td><td>${name}</td>
+    //                       <td>${size / 1000}kb</td>${removing}</tr>`;
+    //     };
+    // }
+
     templates.forEach(iterate);
     return `<table class="${type}">${table}</table>`;
 };
@@ -63,4 +68,4 @@ export const renderDonatePanel = () => {
     //         $donator.attr('href', link + user.id64);
     //     });
     // }
-}
+};
