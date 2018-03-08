@@ -3,6 +3,8 @@ import parseTime from './parse-time';
 
 const REMOVE_SYMBOL = '&#x2716;';
 
+const getTime = time => (time !== 0 ? parseTime(time) : '—');
+
 export const renderTemplatesTable = async (type, data) => {
     const templates = data || await localForege.getItem(`templates-${type}`);
     if (templates === null) { return '<div>table is empty</div>'; }
@@ -12,26 +14,15 @@ export const renderTemplatesTable = async (type, data) => {
     let iterate;
     if (type === 'name') {
         table += `<tr><th>Name</th><th class="time">Time</th><th class="symbol">+</th><th class="symbol">${REMOVE_SYMBOL}</th></tr>`;
-        iterate = ({ name, time, andNew }) => {
-            table += `<tr><td>${name}</td><td>${parseTime(time)}</td><td>${andNew ? '+' : '-'}</td>${removing}</tr>`;
+        iterate = ({ name, time, plus }) => {
+            table += `<tr><td>${name}</td><td>${getTime(time)}</td><td>${plus ? '+' : '—'}</td>${removing}</tr>`;
         };
     } else if (type === 'group') {
         table += `<tr><th>Name(URL)</th><th class="time">Time</th><th class="symbol">${REMOVE_SYMBOL}</th></tr>`;
         iterate = ({ url, time }) => {
-            table += `<tr><td>${url}</td><td>${parseTime(time)}</td>${removing}</tr>`;
+            table += `<tr><td>${url}</td><td>${getTime(time)}</td>${removing}</tr>`;
         };
     }
-
-    // else if (type === 'image') {
-    //     table += `<tr><th>Image</th><th>Name</th>
-    //               <th>Size</th><th class="symbol">${REMOVE_SYMBOL}</th></tr>`;
-    //     iterate = ({ blob }) => {
-    //         const src = URL.createObjectURL(blob);
-    //         const { name, size } = blob;
-    //         table += `<tr><td><img src=${src}></td><td>${name}</td>
-    //                       <td>${size / 1000}kb</td>${removing}</tr>`;
-    //     };
-    // }
 
     templates.forEach(iterate);
     return `<table class="${type}">${table}</table>`;

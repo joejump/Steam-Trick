@@ -8,7 +8,6 @@ import { send as sendMessage } from './libs/messaging';
 // defaults options
 new OptionsSync().define({
     defaults: {
-        imgFileInput: false,
         audioVolume: '40'
     }
 });

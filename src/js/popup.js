@@ -8,20 +8,20 @@ import { localizeHTML } from './libs/localization';
 import { pushElement, removeElement, getElement } from './libs/storage';
 import { renderTemplatesTable, renderDonatePanel } from './libs/html-templates';
 import { on as onMessage } from './libs/messaging';
-// import parseTime from './libs/parse-time';
 
 const saveTemplate = (type, value) => pushElement(`templates-${type}`, value);
 const removeTemplate = (type, index) => removeElement(`templates-${type}`, index);
 const getTemplate = (type, index) => getElement(`templates-${type}`, index);
 
-// TODO click on file input
 
 const start = (user, options) => {
     const {
-        joinToGroup, changeName, actionsList // , changeAvatar
+        joinToGroup, changeName, actionsList
     } = chrome.extension.getBackgroundPage().exports;
 
+    const { personaName } = user;
     const audioVolume = options.audioVolume / 100;
+
 
     onMessage((message) => {
         if (message.type === 'actions-list-updated') {
@@ -30,132 +30,111 @@ const start = (user, options) => {
         }
     });
 
-    const btnShowLoading = ($btn) => {
-        $btn.prop('disabled', true)
-            .addClass('btn-loading');
+    // ID64
+    (new Clipboard('.id64 button')).on('success', (e) => {
+        // TODO: animation
+        $('.id64 button').addClass('flash');
+        e.clearSelection();
+    });
+
+    // MAIN
+    const btnShowLoading = $btn => $btn.prop('disabled', true).addClass('loading');
+    const btnHideLoading = $btn => $btn.prop('disabled', false).removeClass('loading');
+
+    const getTime = (fieldset) => {
+        const time = $(`${fieldset} input[type=time]`)[0].valueAsNumber / 1000;
+        return $(`${fieldset} .js-has-time`).is(':checked') ? time : 0;
     };
 
-    const btnHideLoading = ($btn) => {
-        $btn.prop('disabled', false)
-            .removeClass('btn-loading');
-    };
-
-    // let imageFile = null;
-    // const uploadImage = async () => {
-    //     if (imageFile) {
-    //         const $image = $('.user .avatar img, .preview');
-    //         const $btn = $('#image-fieldset button');
-
-    //         $image.attr('src', '/img/loading.gif');
-    //         btnShowLoading($btn);
-
-    //         const images = await changeAvatar({
-    //             blob: imageFile,
-    //             user,
-    //             onload: () => btnHideLoading($btn)
-    //         });
-    //         $image.attr('src', images.medium);
-
-    //         // save template
-    //         if ($('#image-fieldset .js-save').is(':checked')) {
-    //             saveTemplate('image', { blob: imageFile });
-    //         }
-    //     }
-    // };
-
-    // $('#image-fieldset button').click(uploadImage);
-    // $('#image-fieldset input[type="file"]').change(function () {
-    //     [imageFile] = this.files;
-    //     $('.preview').attr('src', URL.createObjectURL(imageFile));
-
-    //     if (true) {
-    //         uploadImage();
-    //     }
-    // });
-    const getTime = (selector) => {
-        const time = $(`${selector} input[type=time]`).get(0).valueAsNumber / 1000;
-        return $(`${selector} .js-has-time`).is(':checked') ? time : 0;
-    };
+    // Valid time is 0 or greater 10
     const checkTime = (selector, time) => {
         if (Number.isNaN(time) || (time < 10 && time !== 0)) {
-            const input = $(`${selector} input[type=time]`)[0];
-            input.reportValidity();
+            $(selector)[0].reportValidity();
             return false;
         }
         return true;
     };
 
-    $('#group-fieldset button').click(async function () {
-        const $field = $('#group-fieldset .js-field');
-        const url = normalizeUrl($field.val(), { removeQueryParameters: [/[\s\S]+/i] });
+    // group-fieldset
+    const $groupField = $('#group-fieldset .js-field');
+    $('#group-fieldset button').click(function () {
         const time = getTime('#group-fieldset');
 
-        if (checkTime('#group-fieldset', time) && $field[0].reportValidity()) {
+        if (
+            checkTime('#group-fieldset input[type=time]', time) &&
+            $groupField[0].reportValidity()
+        ) {
+            const url = normalizeUrl($groupField.val(), { removeQueryParameters: [/[\s\S]+/i] });
+            const $this = $(this);
+
+            btnShowLoading($this);
+            joinToGroup({
+                time, url, user, onload: () => btnHideLoading($this)
+            });
+
             // save template
             if ($('#group-fieldset .js-save').is(':checked')) {
                 saveTemplate('group', { url, time });
             }
-
-            const $this = $(this);
-            btnShowLoading($this);
-            await joinToGroup({
-                time,
-                url,
-                user,
-                onload: () => {
-                    btnHideLoading($this);
-                }
-            });
         }
     });
 
-    $('#name-fieldset button').click(async function () {
-        const andNew = $('#name-fieldset .js-add-old-name').is(':checked');
-        const time = getTime('#name-fieldset');
-        const $field = $('#name-fieldset .js-field');
+    // name-fieldset
+    const $plus = $('#name-fieldset .plus');
+    const $nameField = $('#name-fieldset .js-field');
+    const deletePresentName = value =>
+        (value.startsWith(personaName) ? value.slice(personaName.length + 1) : value);
 
-        if (checkTime('#name-fieldset', time) && $field[0].reportValidity()) {
-            const name = $field.val();
+    $('#name-fieldset button').click(function () {
+        const time = getTime('#name-fieldset');
+
+        if (
+            checkTime('#name-fieldset input[type=time]', time) &&
+            $nameField[0].reportValidity()
+        ) {
+            const name = $nameField.val();
+            const $this = $(this);
+
+            btnShowLoading($this);
+            changeName({
+                time, user, newName: name, onload: () => btnHideLoading($this)
+            });
 
             // save template
             if ($('#name-fieldset .js-save').is(':checked')) {
-                saveTemplate('name', { name, time, andNew });
-            }
+                // we want to save only a "New Name"
+                const str = deletePresentName(name);
+                const plus = $plus.is(':checked');
 
-            // TODO
-            const newName = andNew ? `${user.personaName} ${name}` : name;
-            const $this = $(this);
-            btnShowLoading($this);
-            await changeName({
-                time,
-                user,
-                newName,
-                onload: () => btnHideLoading($this)
-            });
+                saveTemplate('name', { name: str, time, plus });
+            }
         }
     });
+    $plus.change(() => {
+        $nameField.val((i, value) =>
+            ($plus.is(':checked') ? `${personaName} ${value}` : deletePresentName(value)));
+    });
+    $nameField.keyup(() => {
+        $plus.prop('checked', $nameField.val().startsWith(personaName));
+    });
 
+
+    // TEMPLATES
     // If time is 0 we want to hide time input
-    const setTime = (element, time) => {
-        $(`${element} .js-has-time`).prop('checked', time !== 0);
-        $(`${element} input[type=time]`).get(0).valueAsNumber = time * 1000;
+    const setTime = (fieldset, time) => {
+        $(`${fieldset} .js-has-time`).prop('checked', time !== 0);
+        $(`${fieldset} input[type=time]`)[0].valueAsNumber = time * 1000;
     };
 
-    const setNameTpl = ({ name, time, andNew }) => {
+    const setNameTpl = ({ name, time, plus }) => {
         setTime('#name-fieldset', time);
-        $('#name-fieldset .js-add-old-name').prop('checked', andNew);
-        $('#name-fieldset .js-field').val(name);
+        $nameField.val(!plus ? name : `${personaName} ${name}`);
+        $nameField.trigger('keyup');
     };
-
     const setGroupTpl = ({ url, time }) => {
         setTime('#group-fieldset', time);
-        $('#group-fieldset .js-field').val(url);
+        $groupField.val(url);
     };
-
-    // const setImageTpl = ({ blob }) => {
-    //     imageFile = blob;
-    //     $('.preview').attr('src', URL.createObjectURL(imageFile));
-    // };
 
     // fill inputs
     $('#templates-panel').on('click', '.name tr, .group tr', async function () {
@@ -165,25 +144,11 @@ const start = (user, options) => {
 
         if (type === 'name') { setNameTpl(tpl); }
         if (type === 'group') { setGroupTpl(tpl); }
-        // if (type === 'image') { setImageTpl(tpl); }
         $('a[href="#main-panel"]').trigger('click');
     });
 
-    const clipboard = new Clipboard('.id64 button');
 
-    clipboard.on('success', (e) => {
-        console.info('Action:', e.action);
-        console.info('Text:', e.text);
-        console.info('Trigger:', e.trigger);
-
-        e.clearSelection();
-    });
-
-    clipboard.on('error', (e) => {
-        console.error('Action:', e.action);
-        console.error('Trigger:', e.trigger);
-    });
-
+    // DONATE
     const playAudio = (src, volume) => {
         const audio = new Audio(src);
         audio.volume = volume;
@@ -259,7 +224,7 @@ const waitDocument = () => new Promise(resolve => $(resolve));
 getNotificationCounts()
 
     // TODO: firefox sync storage error
-    .then(() => Promise.all([getUserData(), /* new OptionsSync().getAll(), */waitDocument()]))
+    .then(() => Promise.all([getUserData(), new OptionsSync().getAll(), waitDocument()]))
     .then(([user, options]) => {
         localizeHTML(document.getElementById('unlocalizedPage').textContent, 'body');
         // fill page with data
@@ -290,19 +255,11 @@ getNotificationCounts()
 //     saveTemplate('name', {
 //         name: getRandomStr(getRandomNumb(32)),
 //         time: getRandomNumb(3540),
-//         andNew: !getRandomNumb(1)
+//         plus: !getRandomNumb(1)
 //     });
 
 //     saveTemplate('group', {
 //         url: getRandomStr(getRandomNumb(32)),
 //         time: getRandomNumb(2000)
 //     });
-
-//     // fetch('/img/128.png')
-//     //     .then(res => res.blob())
-//     //     .then((blob) => {
-//     //         saveTemplate('image', {
-//     //             blob
-//     //         });
-//     //     });
 // };
