@@ -1,26 +1,24 @@
 import $ from 'jquery';
+import { parseDataFromHTML, parseDataFromJSON, parseDataFromXML } from './parser';
+import { getId64 } from './steam-utils';
 
 export const getNotificationCounts = () =>
     $.getJSON('https://steamcommunity.com/actions/GetNotificationCounts');
 
-export const getUserData = () =>
-    $.get('https://steamcommunity.com/my?xml=1')
-        .then(xml => $(xml))
-        .then(($xml) => {
-            const customURL = $xml.find('customURL').text();
-            const id64 = $xml.find('steamID64').text();
-            const personaName = $xml.find('steamID').text();
-            const avatar = $xml.find('avatarMedium:first').text();
-            const stateMessage = $xml.find('stateMessage').text();
-            const onlineState = $xml.find('onlineState').text();
-            const profileURL = `https://steamcommunity.com/${customURL ? `id/${customURL}` : `profiles/${id64}`}`;
+export const getUserData = async (sourceType, apiKey) => {
+    if (sourceType === 'html') {
+        const html = await $.get('https://steamcommunity.com/my/edit');
+        return parseDataFromHTML(html);
+    }
 
-            return {
-                profileURL,
-                id64,
-                personaName,
-                avatar,
-                stateMessage,
-                onlineState
-            };
-        });
+    if (sourceType === 'json') {
+        const id64 = await getId64();
+        const API_URL = 'https://api.steampowered.com/';
+
+        const { response: { players: [player] } } =
+            await $.getJSON(`${API_URL}ISteamUser/GetPlayerSummaries/v0002/?key=${apiKey}&steamids=${id64}`);
+        return parseDataFromJSON(player);
+    }
+
+    return parseDataFromXML(await $.get('https://steamcommunity.com/my?xml=1'));
+};

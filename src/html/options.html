@@ -7,24 +7,41 @@
         justify-content: space-around;
         align-items: center;
     }
+    .option  {
+        display: flex;
+        justify-content: space-between;
+    }
 </style>
 <form id="options-form">
-    <!-- <p>
-        <label>
-            <input type="checkbox" name="imgFileInput">
-            File input for image
-        </label>
-    </p> -->
     <p>
-        <label>
-            <input type="range" name="audioVolume">
-            Audio volume
+        <label class="option">
+            <span class="property">Audio volume:</span>
+            <input class="value" type="range" name="audioVolume">
+        </label>
+    </p>
+    <p class="sourceType">
+        <label class="option">
+            <span class="property">Fetch data from:</span>
+            <select class="value" name="sourceType">
+                <option value="xml">XML</option>
+                <option value="html">HTML</option>
+                <option value="json">JSON</option>
+            </select>
+        </label>
+    </p>
+    <!-- visible if source is json -->
+    <p id="apikey-block">
+        <label class="option">
+            <span class="property">Steam API key: 
+                <a href="https://steamcommunity.com/dev/apikey" target="_blank">Get your key</a>
+            </span>
+            <input type="text" class="value" name="apikey" id="apikey" placeholder="Enter your API key" value="">
         </label>
     </p>
 </form>
-<div>
+<!-- <div>
     <button id="clear">Clear Storage</button>
-</div>
+</div> -->
 <div id="links-container">
     <div>
         <a target="_blank" href="https://chrome.google.com/webstore/detail/steam-name-changer/mjapmfaiaogepjdpagcpalaijfngjljl">

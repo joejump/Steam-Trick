@@ -8,7 +8,8 @@ import { send as sendMessage } from './libs/messaging';
 // defaults options
 new OptionsSync().define({
     defaults: {
-        audioVolume: '40'
+        audioVolume: '40',
+        sourceType: 'xml'
     }
 });
 
@@ -23,13 +24,13 @@ class SNCTimer extends CountDownTimer {
         this.propertyes = mainProperties;
     }
     async start() {
-        const index = SNCTimer.actionsList.push(Object.assign(
+        const index = SNCTimer.activities.push(Object.assign(
             this.propertyes,
             { timer: this }
         )) - 1;
 
         await super.start();
-        SNCTimer.actionsList.splice(index, 1);
+        SNCTimer.activities.splice(index, 1);
     }
     addMoreTime(time) {
         this.duration += time;
@@ -45,7 +46,7 @@ class SNCTimer extends CountDownTimer {
     }
 }
 // list of started actions
-SNCTimer.actionsList = [];
+SNCTimer.activities = [];
 
 const joinToGroup = async ({
     time, url, user, onload
@@ -66,8 +67,13 @@ const changeName = async ({
     time, newName, user: { personaName }, onload
 }) => {
     const steamSettings = new SteamSettings({ personaName: newName });
+    let html;
 
-    if (time === 0) return steamSettings.send();
+    if (time === 0) {
+        html = await steamSettings.send();
+        onload();
+        return html;
+    }
 
     if (!changeName.oldName) changeName.oldName = personaName;
     if (changeName.timer) changeName.timer.stop();
@@ -76,8 +82,9 @@ const changeName = async ({
     myTimer.onTick(seconds => chrome.browserAction.setBadgeText({ text: seconds }));
     changeName.timer = myTimer;
 
-    await steamSettings.send();
-    onload();
+    html = await steamSettings.send();
+    onload(html);
+
     await myTimer.start();
 
     // if we apply twice this func, code bellow will execute only once with first oldName
@@ -86,10 +93,10 @@ const changeName = async ({
         steamSettings.setNewSettings({ personaName: changeName.oldName });
         changeName.oldName = '';
 
-        await steamSettings.send();
+        html = await steamSettings.send();
         chrome.browserAction.setBadgeText({ text: '' });
     }
-    return Promise.resolve(myTimer);
+    return html;
 };
 changeName.oldName = '';
 changeName.timer = null;
@@ -100,7 +107,7 @@ const changeAvatar = async ({ blob, user, onload }) => {
         if (onload) onload();
         return images;
     }
-    return Promise.reject(new Error('MAX FILE SIZE'));
+    throw new Error('MAX FILE SIZE');
 };
 
 // This functions will be available in popup window
@@ -108,7 +115,7 @@ window.exports = {
     joinToGroup,
     changeName,
     changeAvatar,
-    actionsList: SNCTimer.actionsList
+    activities: SNCTimer.activities
 };
 
 chrome.browserAction.setBadgeText({ text: '' });

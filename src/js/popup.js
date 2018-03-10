@@ -3,7 +3,8 @@ import Clipboard from 'clipboard';
 import normalizeUrl from 'normalize-url';
 import OptionsSync from 'webext-options-sync';
 import { getNotificationCounts, getUserData } from './steam/user';
-import { openInNewTab } from './libs/utils';
+import { parseDataFromHTML } from './steam/parser';
+import { openInNewTab, showError } from './libs/utils';
 import { localizeHTML } from './libs/localization';
 import { pushElement, removeElement, getElement } from './libs/storage';
 import { renderTemplatesTable, renderDonatePanel } from './libs/html-templates';
@@ -13,19 +14,39 @@ const saveTemplate = (type, value) => pushElement(`templates-${type}`, value);
 const removeTemplate = (type, index) => removeElement(`templates-${type}`, index);
 const getTemplate = (type, index) => getElement(`templates-${type}`, index);
 
+const fillPage = (user) => {
+    // class offline, online, in-game
+    $('.user').addClass(user.onlineState);
 
-const start = (user, options) => {
+    const $username = $('.user .username');
+    if ($username.text(user.personaName).width() > 400) {
+        $username.css('font-size', '18px');
+    }
+
+    $('.user .state-message').html(user.stateMessage);
+    $('.user .id64 button').attr('data-clipboard-text', user.id64);
+    $('.user .avatar img, .preview').attr('src', user.avatar);
+};
+
+const start = ({ user, options }) => {
+    // background
     const {
-        joinToGroup, changeName, actionsList
+        joinToGroup, changeName, activities
     } = chrome.extension.getBackgroundPage().exports;
 
-    const { personaName } = user;
+    // options
     const audioVolume = options.audioVolume / 100;
 
+    let {
+        // profileURL,
+        // id64,
+        // avatar,
+        personaName
+    } = user;
 
     onMessage((message) => {
         if (message.type === 'actions-list-updated') {
-            console.log(actionsList);
+            console.log(activities);
             // TODO list
         }
     });
@@ -43,7 +64,8 @@ const start = (user, options) => {
 
     const getTime = (fieldset) => {
         const time = $(`${fieldset} input[type=time]`)[0].valueAsNumber / 1000;
-        return $(`${fieldset} .js-has-time`).is(':checked') ? time : 0;
+        const hasTime = $(`${fieldset} .js-has-time`).is(':checked');
+        return hasTime ? time : 0;
     };
 
     // Valid time is 0 or greater 10
@@ -85,7 +107,7 @@ const start = (user, options) => {
     const deletePresentName = value =>
         (value.startsWith(personaName) ? value.slice(personaName.length + 1) : value);
 
-    $('#name-fieldset button').click(function () {
+    $('#name-fieldset button').click(async function () {
         const time = getTime('#name-fieldset');
 
         if (
@@ -95,11 +117,6 @@ const start = (user, options) => {
             const name = $nameField.val();
             const $this = $(this);
 
-            btnShowLoading($this);
-            changeName({
-                time, user, newName: name, onload: () => btnHideLoading($this)
-            });
-
             // save template
             if ($('#name-fieldset .js-save').is(':checked')) {
                 // we want to save only a "New Name"
@@ -108,6 +125,22 @@ const start = (user, options) => {
 
                 saveTemplate('name', { name: str, time, plus });
             }
+
+            btnShowLoading($this);
+            // change and update page
+            const html = await changeName({
+                time,
+                user,
+                newName: name,
+                onload: (data) => {
+                    btnHideLoading($this);
+                    fillPage(parseDataFromHTML(data));
+                }
+            });
+            const player = parseDataFromHTML(html);
+            fillPage(player);
+            // ({ personaName }) = player;
+            personaName = player.personaName;
         }
     });
     $plus.change(() => {
@@ -120,6 +153,23 @@ const start = (user, options) => {
 
 
     // TEMPLATES
+    const renderTemplatesPanel = async (type) => {
+        $('#templates-panel .templates').html(await renderTemplatesTable(type));
+    };
+    $('.tabs a[href="#templates-name"], .tabs a[href="#templates-group"]')
+        .click(function (e) {
+            const type = this.hash.replace('#templates-', '');
+            renderTemplatesPanel(type);
+            e.preventDefault();
+        });
+    $('#templates-panel .templates').on('click', '.remove', async function (e) {
+        e.stopPropagation();
+        const index = $(this).parent('tr').index() - 1;
+        const type = $(this).parents('.templates table').attr('class');
+
+        const templates = await removeTemplate(type, index);
+        renderTemplatesPanel(type, templates);
+    });
     // If time is 0 we want to hide time input
     const setTime = (fieldset, time) => {
         $(`${fieldset} .js-has-time`).prop('checked', time !== 0);
@@ -135,7 +185,6 @@ const start = (user, options) => {
         setTime('#group-fieldset', time);
         $groupField.val(url);
     };
-
     // fill inputs
     $('#templates-panel').on('click', '.name tr, .group tr', async function () {
         const type = $(this).parents('.templates table').attr('class');
@@ -173,24 +222,6 @@ const start = (user, options) => {
         e.preventDefault();
     });
 
-    const renderTemplatesPanel = async (type) => {
-        $('#templates-panel .templates').html(await renderTemplatesTable(type));
-    };
-    $('.tabs a[href="#templates-name"], .tabs a[href="#templates-group"]')
-        .click(function (e) {
-            const type = this.hash.replace('#templates-', '');
-            renderTemplatesPanel(type);
-            e.preventDefault();
-        });
-    $('#templates-panel .templates').on('click', '.remove', async function (e) {
-        e.stopPropagation();
-        const index = $(this).parent('tr').index() - 1;
-        const type = $(this).parents('.templates table').attr('class');
-
-        const templates = await removeTemplate(type, index);
-        renderTemplatesPanel(type, templates);
-    });
-
     // Tabs
     $('.tab').click(function (e) {
         // If we have sub-tabs and don't click on them
@@ -204,43 +235,42 @@ const start = (user, options) => {
     });
 };
 
-const fillPage = (user) => {
-    // class offline, online, in-game
-    $('.user').addClass(user.onlineState);
+// Get data and to start an application
+// TODO: check auth
+const getData = async () => {
+    const waitDocument = () => new Promise(resolve => $(resolve));
+    let options;
+    let user;
 
-    const $username = $('.user .username');
-    if ($username.text(user.personaName).width() > 400) {
-        $username.css('font-size', '18px');
+    try {
+        await getNotificationCounts();
+    } catch (e) {
+        if (e.statusText === 'Unauthorized') { openInNewTab('https://steamcommunity.com/login'); }
+    }
+    try {
+        options = await new OptionsSync().getAll();
+    } catch (e) {
+        options = {
+            audioVolume: '40',
+            sourceType: 'xml'
+        };
+    }
+    try {
+        user = await getUserData(options.sourceType, options.apikey);
+    } catch (e) {
+        showError('Error while fetching user data');
     }
 
-    $('.user .state-message').html(user.stateMessage);
-    $('.user .id64 button').attr('data-clipboard-text', user.id64);
-    $('.user .avatar img, .preview').attr('src', user.avatar);
+    await waitDocument();
+    localizeHTML(document.getElementById('unlocalizedPage').textContent, 'body');
+    // fill page with data
+    fillPage(user);
+    // hide animation
+    $('body').addClass('loaded');
+
+    return { user, options };
 };
-
-const waitDocument = () => new Promise(resolve => $(resolve));
-
-// Get data and to start an application
-getNotificationCounts()
-
-    // TODO: firefox sync storage error
-    .then(() => Promise.all([getUserData(), new OptionsSync().getAll(), waitDocument()]))
-    .then(([user, options]) => {
-        localizeHTML(document.getElementById('unlocalizedPage').textContent, 'body');
-        // fill page with data
-        fillPage(user);
-
-        // hide animation
-        $('body').addClass('loaded');
-
-        start(user, options);
-    })
-    .catch((error) => {
-        if (error.statusText === 'Unauthorized') {
-            openInNewTab('https://steamcommunity.com/login');
-        }
-    });
-
+getData().then(start);
 // window.fillTemplates = () => {
 //     const getRandomStr = (len) => {
 //         let text = '';

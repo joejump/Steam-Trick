@@ -7,7 +7,7 @@ export const getCookie = details =>
     });
 export const showError = (text) => {
     chrome.notifications.create({
-        type: 'basic', iconUrl: 'img/128.png', title: 'error', message: text.trim()
+        type: 'basic', iconUrl: '../img/128.png', title: 'error', message: text.trim()
     });
 };
 

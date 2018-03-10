@@ -16,6 +16,9 @@
         "http://steamcommunity.com/*",
         "https://steamcommunity.com/*"
     ],
+    "optional_permissions": [
+        "https://api.steampowered.com/*"
+    ],
     "background": {
         "scripts": [
             "js/background.js"
