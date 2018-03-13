@@ -2,6 +2,7 @@ const path = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ImageminPlugin = require('imagemin-webpack-plugin').default;
 
 const staticFiles = [
     {
@@ -52,7 +53,13 @@ module.exports = (env) => {
             (IS_PRODUCTION && env.browser !== 'firefox') ? new UglifyJSPlugin({
                 parallel: true
             }) : () => null,
-            new CopyWebpackPlugin(staticFilesPath)
+            new CopyWebpackPlugin(staticFilesPath),
+            new ImageminPlugin({
+                disable: IS_PRODUCTION,
+                pngquant: {
+                    quality: '95-100'
+                }
+            })
         ]
     };
 };
