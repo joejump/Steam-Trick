@@ -68,7 +68,7 @@
                     <input type="text" class="js-field"
                         placeholder="__MSG_newName__"
                         title="Must be between 2 and 32 characters in length."
-                        maxlength="32" minlength="2" required>
+                        maxlength="32" minlength="2" required autofocus>
                     <button></button>
                 </div>
             </fieldset>
@@ -104,20 +104,46 @@
             <div class="templates"></div>
         </div>
         <div id="donate-panel" class="panel">
-            <div class="donate-wrapper">
-                <a href="https://goo.gl/xKtbiU" target="_blank" id="donate">
-                    <span>__MSG_donate__</span>
-                    <img src="/img/128.png">
-                </a>
+            <div class="donators">
+                <ul><ul>
             </div>
-            <a class="best-donator row" target="_blank">
-                <img src="/img/loading.gif" alt="Url of user">
-                <div class="name"></div>
-                <span class="money"></span>
-            </a>
-            <span class="show-donation-list">__MSG_top__</span>
-            <ul class="donation-list"></ul>
-            <span class="remove"></span>
+            <div class="donate">
+                <div>Donate:</div>            
+                <ul class="cash">
+                    <li>
+                        <a href="https://goo.gl/xKtbiU">Steam Trade</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="donate">
+                <div>Referrals:</div>            
+                <ul class="referrals">
+                    
+                </ul>
+            </div>
+            <ul class="share">
+                <!-- TODO: links -->
+                <li>
+                    <a href="https://chrome.google.com/webstore/detail/steam-name-changer/mjapmfaiaogepjdpagcpalaijfngjljl">
+                        <img src="../img/chrome-web-store.png">
+                    </a>
+                </li>
+                <!-- <li>
+                    <a href="">
+                        <img src="../img/firefox.png">
+                    </a>
+                </li> -->
+                <li>
+                    <a href="https://github.com/meyson/SteamNameChanger">
+                        <img src="../img/git.png">
+                    </a>
+                </li>
+                <li>
+                    <a href="#" title="Copy link to SNC" data-clipboard-text="https://goo.gl/z6bPWv">
+                        <img src="../img/copy.png">
+                    </a>
+                </li> 
+            </ul>
         </div>
     </main>
 

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import localForege from 'localforage';
 import parseTime from './parse-time';
 
@@ -7,7 +8,7 @@ const getTime = time => (time !== 0 ? parseTime(time) : '—');
 
 export const renderTemplatesTable = async (type, data) => {
     const templates = data || await localForege.getItem(`templates-${type}`);
-    if (templates === null) { return '<div>table is empty</div>'; }
+    if (templates === null) { return '<div class="empty">storage is empty</div>'; }
 
     const removing = `<td class="remove">${REMOVE_SYMBOL}</td>`;
     let table = '';
@@ -28,35 +29,21 @@ export const renderTemplatesTable = async (type, data) => {
     return `<table class="${type}">${table}</table>`;
 };
 
-// let loaded = false;
-export const renderDonatePanel = () => {
-    // if (!loaded) {
-    //     loaded = true;
-    //     //playAudio('audio/1.mp3', 1);
+export const renderDonateData = async () => {
+    const data = await $.getJSON('https://www.jasonbase.com/things/x34M');
+    data.users.sort((a, b) => (+a.cost < +b.cost ? 1 : -1));
 
-    //     $.getJSON('https://www.jasonbase.com/things/x34M', (data) => {
-    //         const link = `${STEAM_URL}profiles/`;
-    //         const frag = document.createDocumentFragment();
+    const users = data.users.reduce((prev, user) => {
+        const img = `<img src="${user.img}">`;
+        const name = `<span class="name">${user.name}</span>`;
+        const cost = `<span class="money">$${user.cost}</span></a>`;
+        const link = `<a href="https://steamcommunity.com/profiles/${user.id64}" target="_blank">${img}${name}${cost}</a>`;
+        return `${prev}<li>${link}</li>`;
+    }, '');
 
-    //         data.users.sort((a, b) => (+a.cost < +b.cost ? 1 : -1));
-    //         data.users.forEach((user, i) => {
-    //             const li = document.createElement('li');
-    //             li.innerHTML = `<a href="${link + user.id64}" target="_blank">`
-    //                 + `<img src="${user.img}">`
-    //                 + `<span class="name">${user.name}</span>`
-    //                 + `<span class="money">${`$${user.cost}`}</span></a>`;
-    //             li.classList.add('underline');
-    //             frag.appendChild(li);
-    //         });
-    //         $('.donation-list').append(frag);
-
-    //         // the best donator
-    //         const user = data.users[0];
-    //         const $donator = $('.best-donator');
-    //         $donator.children('.name').text(user.name);
-    //         $donator.children('.money').text(`$${user.cost}`);
-    //         $donator.children('img').attr('src', user.img);
-    //         $donator.attr('href', link + user.id64);
-    //     });
-    // }
+    const referrals = data.referrals.reduce((prev, { refLink, site }) => {
+        const link = `<a href="${refLink}" target="_blank">${site}</a>`;
+        return `${prev}<li>${link}</li>`;
+    }, '');
+    return { users, referrals };
 };

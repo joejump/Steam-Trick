@@ -35,11 +35,6 @@ module.exports = (env) => {
     }
 
     const staticFilesPath = staticFiles.map(i => ({ context: './src/', ...i }));
-    // staticFilesPath.push({
-    //     from: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js',
-    //     context: './',
-    //     to: 'js'
-    // });
 
     return {
         entry: {
@@ -52,7 +47,6 @@ module.exports = (env) => {
             filename: '[name].js'
         },
         devtool: 'source-map',
-        // const exclude = ['!node_modules{,/**}', '!dist{,/**}'];
         plugins: [
             new CleanWebpackPlugin([DIST_FOLDER]),
             (IS_PRODUCTION && env.browser !== 'firefox') ? new UglifyJSPlugin({

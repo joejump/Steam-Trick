@@ -7,7 +7,7 @@ import { parseDataFromHTML } from './steam/parser';
 import { openInNewTab, showError } from './libs/utils';
 import { localizeHTML } from './libs/localization';
 import { pushElement, removeElement, getElement } from './libs/storage';
-import { renderTemplatesTable, renderDonatePanel } from './libs/html-templates';
+import { renderTemplatesTable, renderDonateData } from './libs/html-templates';
 import { on as onMessage } from './libs/messaging';
 
 const saveTemplate = (type, value) => pushElement(`templates-${type}`, value);
@@ -53,8 +53,6 @@ const start = ({ user, options }) => {
 
     // ID64
     (new Clipboard('.id64 button')).on('success', (e) => {
-        // TODO: animation
-        $('.id64 button').addClass('flash');
         e.clearSelection();
     });
 
@@ -138,9 +136,10 @@ const start = ({ user, options }) => {
                 }
             });
             const player = parseDataFromHTML(html);
+            const nickname = player.personaName;
+
             fillPage(player);
-            // ({ personaName }) = player;
-            personaName = player.personaName;
+            personaName = nickname;
         }
     });
     $plus.change(() => {
@@ -204,23 +203,42 @@ const start = ({ user, options }) => {
         audio.play();
     };
 
-    $('.tabs a[href="#donate-panel"]').click(renderDonatePanel);
-
-    $('.show-donation-list').click(function () {
-        $('#donate, .best-donator').add(this).hide();
-        $('.donation-list, .donation-list + .remove').fadeIn(500);
+    let loaded = false;
+    $('.tabs a[href="#donate-panel"]').click(async () => {
+        if (!loaded) {
+            loaded = true;
+            playAudio('../audio/1.mp3', audioVolume);
+            const data = await renderDonateData();
+            $('#donate-panel .donators ul').html(data.users);
+            $('#donate-panel .donate .referrals').append(data.referrals);
+        }
     });
 
-    $('.donation-list + .remove').click(function () {
-        $('.donation-list').add(this).hide();
-        $('#donate, .best-donator, .show-donation-list').fadeIn(500);
-    });
-
-    $('#donate-panel #donate').click((e) => {
-        playAudio('audio/2.mp3', audioVolume);
+    $('#donate-panel .cash li a').click((e) => {
+        playAudio('../audio/2.mp3', audioVolume);
         setTimeout(() => openInNewTab('https://goo.gl/xKtbiU'), 2500);
         e.preventDefault();
     });
+
+    (new Clipboard('.share a[data-clipboard-text]')).on('success', (e) => {
+        e.clearSelection();
+    });
+
+    // $('.show-donation-list').click(function () {
+    //     $('#donate, .best-donator').add(this).hide();
+    //     $('.donation-list, .donation-list + .remove').fadeIn(500);
+    // });
+
+    // $('.donation-list + .remove').click(function () {
+    //     $('.donation-list').add(this).hide();
+    //     $('#donate, .best-donator, .show-donation-list').fadeIn(500);
+    // });
+
+    // $('#donate-panel #donate').click((e) => {
+    //     playAudio('audio/2.mp3', audioVolume);
+    //     setTimeout(() => openInNewTab('https://goo.gl/xKtbiU'), 2500);
+    //     e.preventDefault();
+    // });
 
     // Tabs
     $('.tab').click(function (e) {
@@ -235,8 +253,6 @@ const start = ({ user, options }) => {
     });
 };
 
-// Get data and to start an application
-// TODO: check auth
 const getData = async () => {
     const waitDocument = () => new Promise(resolve => $(resolve));
     let options;
@@ -250,6 +266,7 @@ const getData = async () => {
     try {
         options = await new OptionsSync().getAll();
     } catch (e) {
+        // TODO
         options = {
             audioVolume: '40',
             sourceType: 'xml'
