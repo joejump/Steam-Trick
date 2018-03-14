@@ -18,7 +18,7 @@ class SNCTimer extends CountDownTimer {
         super(time);
         super.onTick((seconds) => {
             this.propertyes.seconds = seconds;
-            sendMessage({ type: 'actions-list-updated' });
+            sendMessage({ type: 'activities-list' });
         });
 
         this.propertyes = mainProperties;
@@ -64,42 +64,51 @@ const joinToGroup = async ({
 };
 
 const changeName = async ({
-    time, newName, user: { personaName }, onload
+    time, user: { newName, personaName }, onload
 }) => {
+    const { cache } = changeName;
     const steamSettings = new SteamSettings({ personaName: newName });
+    const annul = () => {
+        cache.oldName = '';
+        cache.timer = null;
+        chrome.browserAction.setBadgeText({ text: '' });
+    };
     let html;
+
+    // stop previous timer if it exist
+    if (cache.timer) cache.timer.stop();
 
     if (time === 0) {
         html = await steamSettings.send();
+        annul();
         onload();
         return html;
     }
 
-    if (!changeName.oldName) changeName.oldName = personaName;
-    if (changeName.timer) changeName.timer.stop();
+    if (!cache.oldName) cache.oldName = personaName;
 
-    const myTimer = new SNCTimer(time, { newName, oldName: changeName.oldName });
-    myTimer.onTick(seconds => chrome.browserAction.setBadgeText({ text: seconds }));
-    changeName.timer = myTimer;
+    const timer = new SNCTimer(time, { newName, oldName: cache.oldName });
+    timer.onTick(seconds => chrome.browserAction.setBadgeText({ text: seconds }));
+    cache.timer = timer;
 
     html = await steamSettings.send();
     onload(html);
-
-    await myTimer.start();
+    await timer.start();
 
     // if we apply twice this func, code bellow will execute only once with first oldName
-    if (!myTimer.stopped) {
+    if (!timer.stopped) {
         // return old username to steam
-        steamSettings.setNewSettings({ personaName: changeName.oldName });
-        changeName.oldName = '';
+        steamSettings.setNewSettings({ personaName: cache.oldName });
 
         html = await steamSettings.send();
-        chrome.browserAction.setBadgeText({ text: '' });
+        annul();
     }
     return html;
 };
-changeName.oldName = '';
-changeName.timer = null;
+changeName.cache = {
+    oldName: '',
+    timer: null
+};
 
 const changeAvatar = async ({ blob, user, onload }) => {
     if (blob.size < 1048576) {

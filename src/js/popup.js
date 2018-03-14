@@ -37,15 +37,10 @@ const start = ({ user, options }) => {
     // options
     const audioVolume = options.audioVolume / 100;
 
-    let {
-        // profileURL,
-        // id64,
-        // avatar,
-        personaName
-    } = user;
+    let { personaName } = user;
 
     onMessage((message) => {
-        if (message.type === 'actions-list-updated') {
+        if (message.type === 'activities-list') {
             console.log(activities);
             // TODO list
         }
@@ -112,13 +107,13 @@ const start = ({ user, options }) => {
             checkTime('#name-fieldset input[type=time]', time) &&
             $nameField[0].reportValidity()
         ) {
-            const name = $nameField.val();
+            const newName = $nameField.val();
             const $this = $(this);
 
             // save template
             if ($('#name-fieldset .js-save').is(':checked')) {
                 // we want to save only a "New Name"
-                const str = deletePresentName(name);
+                const str = deletePresentName(newName);
                 const plus = $plus.is(':checked');
 
                 saveTemplate('name', { name: str, time, plus });
@@ -127,9 +122,11 @@ const start = ({ user, options }) => {
             btnShowLoading($this);
             // change and update page
             const html = await changeName({
+                user: {
+                    newName,
+                    personaName
+                },
                 time,
-                user,
-                newName: name,
                 onload: (data) => {
                     btnHideLoading($this);
                     fillPage(parseDataFromHTML(data));
@@ -214,31 +211,14 @@ const start = ({ user, options }) => {
         }
     });
 
-    $('#donate-panel .cash li a').click((e) => {
+    $('#donate-panel .cash li a').click(() => {
         playAudio('../audio/2.mp3', audioVolume);
         setTimeout(() => openInNewTab('https://goo.gl/xKtbiU'), 2500);
-        e.preventDefault();
     });
 
     (new Clipboard('.share a[data-clipboard-text]')).on('success', (e) => {
         e.clearSelection();
     });
-
-    // $('.show-donation-list').click(function () {
-    //     $('#donate, .best-donator').add(this).hide();
-    //     $('.donation-list, .donation-list + .remove').fadeIn(500);
-    // });
-
-    // $('.donation-list + .remove').click(function () {
-    //     $('.donation-list').add(this).hide();
-    //     $('#donate, .best-donator, .show-donation-list').fadeIn(500);
-    // });
-
-    // $('#donate-panel #donate').click((e) => {
-    //     playAudio('audio/2.mp3', audioVolume);
-    //     setTimeout(() => openInNewTab('https://goo.gl/xKtbiU'), 2500);
-    //     e.preventDefault();
-    // });
 
     // Tabs
     $('.tab').click(function (e) {
@@ -288,25 +268,3 @@ const getData = async () => {
     return { user, options };
 };
 getData().then(start);
-// window.fillTemplates = () => {
-//     const getRandomStr = (len) => {
-//         let text = '';
-//         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-//         for (let i = 0; i < len; i += 1) {
-//             text += possible.charAt(Math.floor(Math.random() * possible.length));
-//         }
-//         return text;
-//     };
-//     const getRandomNumb = max => ~~(Math.random() * max);
-
-//     saveTemplate('name', {
-//         name: getRandomStr(getRandomNumb(32)),
-//         time: getRandomNumb(3540),
-//         plus: !getRandomNumb(1)
-//     });
-
-//     saveTemplate('group', {
-//         url: getRandomStr(getRandomNumb(32)),
-//         time: getRandomNumb(2000)
-//     });
-// };

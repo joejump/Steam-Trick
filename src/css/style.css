@@ -182,9 +182,10 @@ nav.tabs {
     display: flex;
     justify-content: center;
 }
+/* TODO: padding js */
 .tabs .primary li a {
     display: block;
-    padding: 10px 25px;
+    padding: 10px 15px;
     border-right: 1px solid #3D3D3D;
     color: #fff;
 }
@@ -303,7 +304,7 @@ nav.tabs {
     font-size: 15px;
     border-bottom: 1px solid;
     animation-fill-mode: forwards;
-    animation-duration: .3s;
+    animation-duration: .5s;
 }
 .id64 > button:hover {
     color: #2c3e50;
@@ -497,6 +498,7 @@ nav.tabs {
 #donate-panel .donators a {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 #donate-panel .share a,
 #donate-panel .donate a {
@@ -571,7 +573,7 @@ nav.tabs {
 }
 #donate-panel .share li:last-child > a {
     animation-fill-mode: forwards;
-    animation-duration: .3s;
+    animation-duration: .5s;
 }
 #donate-panel .share li:last-child > a:focus {
     animation-name: flash;

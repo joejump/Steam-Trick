@@ -23,6 +23,7 @@
         <nav class="tabs">
           <ul class="primary row">
             <li class="tab active"><a href="#main-panel">__MSG_mainTab__</a></li>
+            <li class="tab"><a href="#activities">|||</a></li>
             <li class="tab">
               <a href="#templates-panel">__MSG_templateTab__</a>
               <ul class="sub">
@@ -100,6 +101,22 @@
             </fieldset>
 
         </div>
+        <div id="activities" class="panel">
+            <ul id="activities-list">
+                <li>
+                    <span class="name">Some name...</span>
+                    <span class="time">0:12s</span>
+                    <input class="add" title="use scroll" type="number" value="10" min="1">
+                    <span class="cancel">&#x2716;</span>
+                </li>
+                <li>
+                    <span class="group">Some group...</span>
+                    <span class="time">1:22s</span>
+                    <input class="add" title="use scroll" type="number" value="10" min="1">
+                    <span class="cancel">&#x2716;</span>
+                </li>      
+            <ul>
+        </div>
         <div id="templates-panel" class="panel">
             <div class="templates"></div>
         </div>
@@ -139,8 +156,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" title="Copy link to SNC" data-clipboard-text="https://goo.gl/z6bPWv">
-                        <img src="../img/copy.png">
+                    <a href="#" data-clipboard-text="https://goo.gl/z6bPWv">
+                        <span>Copy link</span>
                     </a>
                 </li> 
             </ul>
