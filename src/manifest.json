@@ -16,6 +16,12 @@
         "http://steamcommunity.com/*",
         "https://steamcommunity.com/*"
     ],
+    "applications": {
+        "gecko": {
+          "id": "{b2696e0d-327b-41a0-aafb-e2c15aefebc8}",
+          "strict_min_version": "55.0"
+        }
+    },
     "optional_permissions": [
         "https://api.steampowered.com/*"
     ],

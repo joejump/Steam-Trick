@@ -533,13 +533,23 @@ nav.tabs {
 #donate-panel .referrals li {
     margin-right: 6px;
 }
-
 #donate-panel .cash a, 
 #donate-panel .referrals a {
-    color: #5200a2;
+    color: #207500;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+#donate-panel .share a[href="#"] {
+    padding: 8px;
+    border: 2px solid;
+    border-radius: 50%;
+    color: #000;
+}
+#donate-panel .cash a:hover, 
+#donate-panel .referrals a:hover,
+#donate-panel .share a[href="#"]:hover {
     text-decoration: underline;
 }
-
 #donate-panel .donate li {
     margin-right: 7px;
 }

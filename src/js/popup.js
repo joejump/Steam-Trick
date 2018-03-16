@@ -19,8 +19,10 @@ const fillPage = (user) => {
     $('.user').addClass(user.onlineState);
 
     const $username = $('.user .username');
-    if ($username.text(user.personaName).width() > 400) {
+    if ($username.text(user.personaName).width() > 300) {
         $username.css('font-size', '18px');
+    } else {
+        $username.css('font-size', '25px');
     }
 
     $('.user .state-message').html(user.stateMessage);
@@ -235,7 +237,6 @@ const start = ({ user, options }) => {
 
 const getData = async () => {
     const waitDocument = () => new Promise(resolve => $(resolve));
-    let options;
     let user;
 
     try {
@@ -243,15 +244,9 @@ const getData = async () => {
     } catch (e) {
         if (e.statusText === 'Unauthorized') { openInNewTab('https://steamcommunity.com/login'); }
     }
-    try {
-        options = await new OptionsSync().getAll();
-    } catch (e) {
-        // TODO
-        options = {
-            audioVolume: '40',
-            sourceType: 'xml'
-        };
-    }
+
+    const options = await new OptionsSync().getAll();
+
     try {
         user = await getUserData(options.sourceType, options.apikey);
     } catch (e) {

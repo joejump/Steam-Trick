@@ -35,9 +35,11 @@ export default class SteamSettings {
                 const form = html.getElementById('editForm');
 
                 // Set background
-                const backgroundId = form.querySelector('.formRow + script').textContent
-                    .match(/(communityitemid)":"((\\"|[^"])*)/);
-                form.querySelector('#profile_background').value = backgroundId ? backgroundId[2] : '';
+                const background = form.querySelector('.formRow + script');
+                if (background) {
+                    const backgroundId = background.textContent.match(/(communityitemid)":"((\\"|[^"])*)/);
+                    form.querySelector('#profile_background').value = backgroundId ? backgroundId[2] : '';
+                }
 
                 this.formData = new FormData(form);
                 this.editURL = form.action;
