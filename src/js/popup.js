@@ -3,12 +3,12 @@ import Clipboard from 'clipboard';
 import normalizeUrl from 'normalize-url';
 import OptionsSync from 'webext-options-sync';
 import { getNotificationCounts, getUserData } from './steam/user';
+import { localizeHTML } from './libs/localization';
+import { on as onMessage } from './libs/messaging';
 import { parseDataFromHTML } from './steam/parser';
 import { openInNewTab, showError } from './libs/utils';
-import { localizeHTML } from './libs/localization';
 import { pushElement, removeElement, getElement } from './libs/storage';
-import { renderTemplatesTable, renderDonateData } from './libs/html-templates';
-import { on as onMessage } from './libs/messaging';
+import { renderTemplatesTable, renderDonateData, renderActivity } from './libs/html-templates';
 
 const saveTemplate = (type, value) => pushElement(`templates-${type}`, value);
 const removeTemplate = (type, index) => removeElement(`templates-${type}`, index);
@@ -40,13 +40,6 @@ const start = ({ user, options }) => {
     const audioVolume = options.audioVolume / 100;
 
     let { personaName } = user;
-
-    onMessage((message) => {
-        if (message.type === 'activities-list') {
-            console.log(activities);
-            // TODO list
-        }
-    });
 
     // ID64
     (new Clipboard('.id64 button')).on('success', (e) => {
@@ -220,6 +213,43 @@ const start = ({ user, options }) => {
 
     (new Clipboard('.share a[data-clipboard-text]')).on('success', (e) => {
         e.clearSelection();
+    });
+
+    // ACTIVITIES
+    const $activitiesList = $('#activities-list');
+    const renderActivities = () => {
+        const { cache } = renderActivities;
+
+        activities.forEach((activity) => {
+            if (cache[activity.timer.id]) {
+                cache[activity.timer.id].children('.time').text(`${activity.seconds}s`);
+            } else {
+                const $li = $(renderActivity(activity));
+                cache[activity.timer.id] = $li;
+                $activitiesList.append($li);
+
+                // delete if expired
+                activity.timer.onFinish(() => {
+                    cache[activity.timer.id].remove();
+                    delete cache[activity.timer.id];
+                });
+            }
+        });
+    };
+    renderActivities.cache = {};
+
+    onMessage((message) => {
+        if (message.type === 'activities-list') {
+            renderActivities();
+        }
+    });
+    $activitiesList.on('click', 'li .finish', function () {
+        const index = $(this).parent().index();
+        activities[index].timer.finish();
+    });
+    $activitiesList.on('click', 'li .add', function () {
+        const index = $(this).parent().index();
+        activities[index].timer.addMoreTime(10);
     });
 
     // Tabs

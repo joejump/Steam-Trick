@@ -2,24 +2,22 @@ import $ from 'jquery';
 import localForege from 'localforage';
 import parseTime from './parse-time';
 
-const REMOVE_SYMBOL = '&#x2716;';
-
 const getTime = time => (time !== 0 ? parseTime(time) : '—');
 
 export const renderTemplatesTable = async (type, data) => {
     const templates = data || await localForege.getItem(`templates-${type}`);
     if (templates === null) { return '<div class="empty">storage is empty</div>'; }
 
-    const removing = `<td class="remove">${REMOVE_SYMBOL}</td>`;
+    const removing = '<td class="remove">&#x2716;</td>';
     let table = '';
     let iterate;
     if (type === 'name') {
-        table += `<tr><th>Name</th><th class="time">Time</th><th class="symbol">+</th><th class="symbol">${REMOVE_SYMBOL}</th></tr>`;
+        table += '<tr><th>Name</th><th class="time">Time</th><th class="symbol">+</th><th class="symbol">&#x2716;</th></tr>';
         iterate = ({ name, time, plus }) => {
             table += `<tr><td>${name}</td><td>${getTime(time)}</td><td>${plus ? '+' : '—'}</td>${removing}</tr>`;
         };
     } else if (type === 'group') {
-        table += `<tr><th>Name(URL)</th><th class="time">Time</th><th class="symbol">${REMOVE_SYMBOL}</th></tr>`;
+        table += '<tr><th>Name(URL)</th><th class="time">Time</th><th class="symbol">&#x2716;</th></tr>';
         iterate = ({ url, time }) => {
             table += `<tr><td>${url}</td><td>${getTime(time)}</td>${removing}</tr>`;
         };
@@ -37,7 +35,9 @@ export const renderDonateData = async () => {
         const img = `<img src="${user.img}">`;
         const name = `<span class="name">${user.name}</span>`;
         const cost = `<span class="money">$${user.cost}</span></a>`;
-        const link = `<a href="https://steamcommunity.com/profiles/${user.id64}" target="_blank">${img}${name}${cost}</a>`;
+        const href = `https://steamcommunity.com/profiles/${user.id64}`;
+
+        const link = `<a href="${href}" target="_blank">${img}${name}${cost}</a>`;
         return `${prev}<li>${link}</li>`;
     }, '');
 
@@ -46,4 +46,27 @@ export const renderDonateData = async () => {
         return `${prev}<li>${link}</li>`;
     }, '');
     return { users, referrals };
+};
+
+export const renderActivity = (activitie) => {
+    let li = '';
+    const template = `<span class="add">+10</span>
+                      <span class="time">${activitie.seconds}s</span>
+                      <span class="finish">&#x2716;</span>`;
+
+    if (activitie.type === 'name') {
+        li = `<li class="type-name">
+                    <span class="name">${activitie.newName}</span>
+                    ${template}
+                </li>`;
+    }
+
+    if (activitie.type === 'group') {
+        li = `<li class="type-group">
+                    <img class="icon" src=${activitie.avatarIcon}>                   
+                    <span class="name">${activitie.groupName}</span>
+                    ${template}
+                </li>`;
+    }
+    return li;
 };
