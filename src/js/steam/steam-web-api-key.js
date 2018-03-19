@@ -6,10 +6,10 @@ const parseKey = (html) => {
         throw new Error('Access Denied');
     }
 
-    const keyElement = html.querySelector('#bodyContents_ex > p:nth-child(2)');
-    return keyElement ?
-        keyElement.textContent.split(' ')[1] :
-        '';
+    if (html.querySelector('#bodyContents_ex h2').textContent === 'Your Steam Web API Key') {
+        return html.querySelector('#bodyContents_ex > p:nth-child(2)').textContent.split(' ')[1];
+    }
+    return '';
 };
 
 const getKey = async () => parseKey(await api.get('https://steamcommunity.com/dev/apikey'));

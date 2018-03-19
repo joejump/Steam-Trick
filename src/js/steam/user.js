@@ -19,10 +19,18 @@ export const getUserData = async (sourceType, apiKey) => {
         const id64 = await getId64();
         const API_URL = 'https://api.steampowered.com/';
 
-        const {
-            response: { players: [player] }
-        } = await $.getJSON(`${API_URL}ISteamUser/GetPlayerSummaries/v0002/?key=${apiKey}&steamids=${id64}`);
-        return parseDataFromJSON(player);
+        try {
+            const {
+                response: { players: [player] }
+            } = await $.getJSON(`${API_URL}ISteamUser/GetPlayerSummaries/v0002/?key=${apiKey}&steamids=${id64}`);
+
+            return parseDataFromJSON(player);
+        } catch (e) {
+            if (e.statusText === 'Forbidden') {
+                throw new Error('Api key is invalid. Go to options');
+            }
+            throw new Error(e);
+        }
     }
 
     return parseDataFromXML(await $.get('https://steamcommunity.com/my?xml=1'));

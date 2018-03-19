@@ -7,7 +7,7 @@ export const getCookie = details =>
     });
 export const showError = (text) => {
     chrome.notifications.create({
-        type: 'basic', iconUrl: '../img/warning.svg', title: 'ERROR', message: text.trim()
+        type: 'basic', iconUrl: '../img/warning.svg', title: 'ERROR', message: text.toString().trim()
     });
 };
 export const openInNewTab = (url) => {
