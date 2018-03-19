@@ -65,18 +65,18 @@ const joinToGroup = async ({
     time, url, user, onload
 }) => {
     const group = new SteamGroup(url, user);
-    if (time === 0) return group.join();
-
     // Join to group
     await group.join();
-    if (onload) onload();
 
-    const mainProperties = Object.assign({ type: 'group' }, group);
-    const timer = new SNCTimer(time, mainProperties);
-    await timer.start();
+    if (onload) onload(group.groupName);
 
-    // After some time leave it
-    return group.leave();
+    if (time !== 0) {
+        const mainProperties = Object.assign({ type: 'group' }, group);
+        const timer = new SNCTimer(time, mainProperties);
+        await timer.start();
+        // After some time leave it
+        await group.leave();
+    }
 };
 
 const changeName = async ({

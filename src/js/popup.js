@@ -75,25 +75,36 @@ const start = ({ user, options }) => {
 
     // group-fieldset
     const $groupField = $('#group-fieldset .js-field');
-    $('#group-fieldset button').click(function () {
+    $('#group-fieldset button').click(async function () {
         const time = getTime('#group-fieldset');
 
         if (
-            checkTime('#group-fieldset input[type=time]', time) &&
-            $groupField[0].reportValidity()
-        ) {
-            const url = normalizeUrl($groupField.val(), { removeQueryParameters: [/[\s\S]+/i] });
-            const $this = $(this);
+            !checkTime('#group-fieldset input[type=time]', time) &&
+            !$groupField[0].reportValidity()
+        ) { return; }
 
-            btnShowLoading($this);
-            joinToGroup({
-                time, url, user, onload: () => btnHideLoading($this)
-            });
+        const url = normalizeUrl($groupField.val(), { removeQueryParameters: [/[\s\S]+/i] });
+        const $this = $(this);
 
+        const onload = (groupName) => {
+            btnHideLoading($this);
             // save template
             if ($('#group-fieldset .js-save').is(':checked')) {
-                saveTemplate('group', { url, time });
+                saveTemplate('group', { groupName, url, time });
             }
+        };
+
+        try {
+            btnShowLoading($this);
+            await joinToGroup({
+                time,
+                url,
+                user,
+                onload
+            });
+        } catch (e) {
+            showError(e);
+            btnHideLoading($this);
         }
     });
 
@@ -107,21 +118,23 @@ const start = ({ user, options }) => {
         const time = getTime('#name-fieldset');
 
         if (
-            checkTime('#name-fieldset input[type=time]', time) &&
-            $nameField[0].reportValidity()
-        ) {
-            const newName = $nameField.val();
-            const $this = $(this);
+            !checkTime('#name-fieldset input[type=time]', time) &&
+            !$nameField[0].reportValidity()
+        ) { return; }
 
-            // save template
-            if ($('#name-fieldset .js-save').is(':checked')) {
-                // we want to save only a "New Name"
-                const str = deletePresentName(newName);
-                const plus = $plus.is(':checked');
+        const newName = $nameField.val();
 
-                saveTemplate('name', { name: str, time, plus });
-            }
+        // save template
+        if ($('#name-fieldset .js-save').is(':checked')) {
+            // we want to save only a "New Name"
+            const str = deletePresentName(newName);
+            const plus = $plus.is(':checked');
 
+            saveTemplate('name', { name: str, time, plus });
+        }
+
+        const $this = $(this);
+        try {
             btnShowLoading($this);
             // change and update page
             const html = await changeName({
@@ -140,6 +153,9 @@ const start = ({ user, options }) => {
 
             fillPage(player);
             personaName = nickname;
+        } catch (e) {
+            showError(e);
+            btnHideLoading($this);
         }
     });
     $plus.change(() => {

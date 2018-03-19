@@ -13,13 +13,13 @@ export const renderTemplatesTable = async (type, data) => {
     let iterate;
     if (type === 'name') {
         table += '<tr><th>Name</th><th class="time">Time</th><th class="symbol">+</th><th class="symbol">&#x2716;</th></tr>';
-        iterate = ({ name, time, plus }) => {
+        iterate = ({ name, plus, time }) => {
             table += `<tr><td>${name}</td><td>${getTime(time)}</td><td>${plus ? '+' : '—'}</td>${removing}</tr>`;
         };
     } else if (type === 'group') {
         table += '<tr><th>Name(URL)</th><th class="time">Time</th><th class="symbol">&#x2716;</th></tr>';
-        iterate = ({ url, time }) => {
-            table += `<tr><td>${url}</td><td>${getTime(time)}</td>${removing}</tr>`;
+        iterate = ({ url, groupName, time }) => {
+            table += `<tr><td title="${url}">${groupName}</td><td>${getTime(time)}</td>${removing}</tr>`;
         };
     }
 
