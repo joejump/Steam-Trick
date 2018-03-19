@@ -22,6 +22,10 @@ const staticFiles = [
     },
     {
         from: 'manifest.json'
+    },
+    {
+        from: '../node_modules/jquery/dist/jquery.min.js',
+        to: 'js'
     }
 ];
 
@@ -42,6 +46,9 @@ module.exports = (env) => {
             'js/popup': './src/js/popup',
             'js/background': './src/js/background',
             'js/options': './src/js/options'
+        },
+        externals: {
+            jquery: 'jQuery'
         },
         output: {
             path: path.join(__dirname, DIST_FOLDER),
