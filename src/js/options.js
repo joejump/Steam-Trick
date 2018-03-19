@@ -1,5 +1,5 @@
 import OptionsSync from 'webext-options-sync';
-import { showError } from './libs/utils';
+import getWebApiKey from './steam/steam-web-api-key';
 
 const optionsSync = new OptionsSync();
 optionsSync.syncForm('#options-form');
@@ -29,12 +29,14 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     }
 });
 
-document.querySelector('select[name="sourceType"]').addEventListener('change', function () {
-    if (this.value === 'json') {
-        chrome.permissions.request({
-            origins: ['https://api.steampowered.com/*']
-        }, (granted) => {
-            if (!granted) { showError('You must allow it if you want to use JSON api'); }
-        });
-    }
-});
+document.querySelector('select[name="sourceType"]')
+    .addEventListener('change', async function () {
+        if (this.value === 'json') {
+            const apiKeyField = document.getElementById('apikey');
+
+            if (!apiKeyField.value) {
+                const key = await getWebApiKey();
+                apiKeyField.value = key;
+            }
+        }
+    });

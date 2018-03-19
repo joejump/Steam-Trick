@@ -523,6 +523,10 @@ nav.tabs {
     flex-basis: 62px;
     margin: auto 10px auto 0;
 }
+#donate-panel .open-all:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
 #donate-panel .cash,
 #donate-panel .referrals {
     display: flex;
@@ -590,6 +594,10 @@ nav.tabs {
 }
 
 /* ACTIVITIES Panel*/
+.tabs .primary li a[href="#activities"] {
+    display: none;
+}
+
 #activities-list {
     display: flex;
     flex-direction: column;

@@ -41,6 +41,14 @@ const start = ({ user, options }) => {
 
     let { personaName } = user;
 
+    // localize HTML
+    localizeHTML(document.getElementById('unlocalizedPage').textContent, 'body');
+    // fill page with data
+    fillPage(user);
+    // hide animation
+    $('body').addClass('loaded');
+
+
     // ID64
     (new Clipboard('.id64 button')).on('success', (e) => {
         e.clearSelection();
@@ -206,9 +214,10 @@ const start = ({ user, options }) => {
         }
     });
 
-    $('#donate-panel .cash li a').click(() => {
+    $('#donate-panel .cash li a').click((e) => {
         playAudio('../audio/2.mp3', audioVolume);
         setTimeout(() => openInNewTab('https://goo.gl/xKtbiU'), 2500);
+        e.preventDefault();
     });
 
     (new Clipboard('.share a[data-clipboard-text]')).on('success', (e) => {
@@ -232,7 +241,13 @@ const start = ({ user, options }) => {
                 activity.timer.onFinish(() => {
                     cache[activity.timer.id].remove();
                     delete cache[activity.timer.id];
+
+                    if ($.isEmptyObject(cache)) {
+                        $('.tabs a[href="#activities"]').css('display', 'none');
+                    }
                 });
+                // show activities tab
+                $('.tabs a[href="#activities"]').css('display', 'block');
             }
         });
     };
@@ -280,15 +295,10 @@ const getData = async () => {
     try {
         user = await getUserData(options.sourceType, options.apikey);
     } catch (e) {
-        showError('Error while fetching user data');
+        showError(e.message);
     }
 
     await waitDocument();
-    localizeHTML(document.getElementById('unlocalizedPage').textContent, 'body');
-    // fill page with data
-    fillPage(user);
-    // hide animation
-    $('body').addClass('loaded');
 
     return { user, options };
 };

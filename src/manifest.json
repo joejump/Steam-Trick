@@ -14,7 +14,8 @@
         "notifications",
         "cookies",
         "http://steamcommunity.com/*",
-        "https://steamcommunity.com/*"
+        "https://steamcommunity.com/*",
+        "https://api.steampowered.com/*"
     ],
     "applications": {
         "gecko": {
