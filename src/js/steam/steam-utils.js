@@ -14,6 +14,8 @@ export const getId64 = async () => {
     return id64;
 };
 
+export const checkAuth = () => getSteamCookie({ name: 'steamLogin' });
+
 // Check Steam error which can be in html after request
 export const checkError = (html, selector) => {
     const errorText = html.querySelector(selector);

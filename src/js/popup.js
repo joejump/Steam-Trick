@@ -7,6 +7,7 @@ import { localizeHTML } from './libs/localization';
 import { on as onMessage } from './libs/messaging';
 import { parseDataFromHTML } from './steam/parser';
 import { openInNewTab, showError } from './libs/utils';
+import { checkAuth } from './steam/steam-utils';
 import { pushElement, removeElement, getElement } from './libs/storage';
 import { renderTemplatesTable, renderDonateData, renderActivity } from './libs/html-templates';
 
@@ -78,14 +79,16 @@ const start = ({ user, options }) => {
     $('#group-fieldset button').click(async function () {
         const time = getTime('#group-fieldset');
 
+        // validation
         if (
-            !checkTime('#group-fieldset input[type=time]', time) &&
+            !checkTime('#group-fieldset input[type=time]', time) ||
             !$groupField[0].reportValidity()
         ) { return; }
 
         const url = normalizeUrl($groupField.val(), { removeQueryParameters: [/[\s\S]+/i] });
         const $this = $(this);
 
+        // will be executed after request
         const onload = (groupName) => {
             btnHideLoading($this);
             // save template
@@ -117,23 +120,31 @@ const start = ({ user, options }) => {
     $('#name-fieldset button').click(async function () {
         const time = getTime('#name-fieldset');
 
+        // validation
         if (
-            !checkTime('#name-fieldset input[type=time]', time) &&
+            !checkTime('#name-fieldset input[type=time]', time) ||
             !$nameField[0].reportValidity()
         ) { return; }
 
         const newName = $nameField.val();
-
-        // save template
-        if ($('#name-fieldset .js-save').is(':checked')) {
-            // we want to save only a "New Name"
-            const str = deletePresentName(newName);
-            const plus = $plus.is(':checked');
-
-            saveTemplate('name', { name: str, time, plus });
-        }
-
         const $this = $(this);
+
+        // will be executed afrer request
+        const onload = (data) => {
+            btnHideLoading($this);
+
+            // update data on page
+            fillPage(parseDataFromHTML(data));
+
+            // save template
+            if ($('#name-fieldset .js-save').is(':checked')) {
+                // we want to save only a "New Name"
+                const str = deletePresentName(newName);
+                const plus = $plus.is(':checked');
+
+                saveTemplate('name', { name: str, time, plus });
+            }
+        };
         try {
             btnShowLoading($this);
             // change and update page
@@ -143,11 +154,9 @@ const start = ({ user, options }) => {
                     personaName
                 },
                 time,
-                onload: (data) => {
-                    btnHideLoading($this);
-                    fillPage(parseDataFromHTML(data));
-                }
+                onload
             });
+            // update data on page
             const player = parseDataFromHTML(html);
             const nickname = player.personaName;
 
@@ -301,9 +310,10 @@ const getData = async () => {
     let user;
 
     try {
-        await getNotificationCounts();
+        await checkAuth();
     } catch (e) {
-        if (e.statusText === 'Unauthorized') { openInNewTab('https://steamcommunity.com/login'); }
+        showError(e);
+        setTimeout(() => openInNewTab('https://steamcommunity.com/login'), 1000);
     }
 
     const options = await new OptionsSync().getAll();
@@ -311,7 +321,7 @@ const getData = async () => {
     try {
         user = await getUserData(options.sourceType, options.apikey);
     } catch (e) {
-        showError(e.message);
+        showError(e);
     }
 
     await waitDocument();

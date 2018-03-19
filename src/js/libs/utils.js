@@ -5,9 +5,11 @@ export const getCookie = details =>
             (cookie !== null) ? resolve(cookie) : reject(new Error('We don\'t have a cookie. You have to be logged in'))
         ));
     });
-export const showError = (text) => {
+export const showError = (error) => {
+    const message = (error.message) ? error.message : error.toString();
+
     chrome.notifications.create({
-        type: 'basic', iconUrl: '../img/warning.svg', title: 'ERROR', message: text.toString().trim()
+        type: 'basic', iconUrl: '../img/warning.svg', title: 'Error :(', message: message.trim()
     });
 };
 export const openInNewTab = (url) => {
