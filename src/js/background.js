@@ -30,10 +30,13 @@ class SNCTimer extends CountDownTimer {
     }
     async start() {
         const obj = Object.assign(this.propertyes, { timer: this });
-        const index = SNCTimer.activities.push(obj) - 1;
+        SNCTimer.activities[this.id] = obj;
 
         await super.start();
-        SNCTimer.activities.splice(index, 1);
+
+        delete SNCTimer.activities[this.id];
+
+        this.onFinishFunc.forEach(fun => fun.call(this));
     }
 
     addMoreTime(time) {
@@ -44,8 +47,6 @@ class SNCTimer extends CountDownTimer {
     async finish() {
         this.duration = 0;
         await this._promise;
-        this.onFinishFunc.forEach(fun => fun.call(this));
-
         return this;
     }
     onFinish(fun) {
@@ -58,7 +59,7 @@ class SNCTimer extends CountDownTimer {
     }
 }
 // list of started actions
-SNCTimer.activities = [];
+SNCTimer.activities = {};
 SNCTimer.activitiesId = 0;
 
 const joinToGroup = async ({
@@ -84,6 +85,7 @@ const changeName = async ({
 }) => {
     const { cache } = changeName;
     const steamSettings = new SteamSettings({ personaName: newName });
+
     const annul = () => {
         cache.oldName = '';
         cache.timer = null;
@@ -103,9 +105,14 @@ const changeName = async ({
 
     if (!cache.oldName) cache.oldName = personaName;
 
-    const mainProperties = { type: 'name', newName, oldName: cache.oldName };
+    const mainProperties = {
+        type: 'name',
+        oldName: cache.oldName,
+        newName
+    };
     const timer = new SNCTimer(time, mainProperties);
-    timer.onTick(seconds => chrome.browserAction.setBadgeText({ text: seconds }));
+    timer.onTick(seconds =>
+        chrome.browserAction.setBadgeText({ text: seconds }));
 
     cache.timer = timer;
 

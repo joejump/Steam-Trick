@@ -62,9 +62,11 @@ export const renderActivity = (activitie) => {
     }
 
     if (activitie.type === 'group') {
+        const { avatarIcon, groupURL, groupName } = activitie;
+
         li = `<li class="type-group">
-                    <img class="icon" src=${activitie.avatarIcon}>                   
-                    <span class="name">${activitie.groupName}</span>
+                    <img class="icon" src=${avatarIcon}>                   
+                    <a href="${groupURL}" target="_blank" class="name">${groupName}</a>
                     ${template}
                 </li>`;
     }

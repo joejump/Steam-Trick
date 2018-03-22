@@ -29,7 +29,7 @@ $(document).ready(() => {
         const key = await getWebApiKey();
 
         $keyField.val(key);
-        // FIXME:
+        // FIXME: update value in storage
         optionsSync._handleFormUpdates({ target: $keyField[0] });
     };
 

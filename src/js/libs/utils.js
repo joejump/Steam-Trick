@@ -12,6 +12,6 @@ export const showError = (error) => {
         type: 'basic', iconUrl: '../img/warning.svg', title: 'Error :(', message: message.trim()
     });
 };
-export const openInNewTab = (url) => {
+export const openInNewTab = url =>
     window.open(url, '_blank').focus();
-};
+

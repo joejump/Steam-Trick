@@ -182,7 +182,6 @@ nav.tabs {
     display: flex;
     justify-content: center;
 }
-/* TODO: padding js */
 .tabs .primary li a {
     display: block;
     padding: 10px 15px;
@@ -448,12 +447,14 @@ nav.tabs {
     border-spacing: 0;
     width: 100%;
     border: 1px solid #ddd;
-    cursor: pointer;
 }
 .templates table th,
 .templates table td {
     text-align: center;
     padding: 10px;
+}
+.templates table td {
+    cursor: pointer;
 }
 .templates table th:first-child,
 .templates table td:first-child {
@@ -466,7 +467,7 @@ nav.tabs {
 .templates table tr:nth-child(even) {
     background-color: #f2f2f2
 }
-.templates table tr:hover {
+.templates table tr:not(:first-child):hover {
     background-color: #e8e8e8;
 }
 .templates table .symbol {
@@ -594,10 +595,19 @@ nav.tabs {
 }
 
 /* ACTIVITIES Panel*/
-.tabs .primary li a[href="#activities"] {
+.tabs.activities .primary li a {
+    padding: 10px;
+}
+.tabs:not(.activities) #activities-tab {
     display: none;
 }
-
+#activities-tab a {
+    background-color: #b30000;
+    font-weight: bold;
+}
+#activities-tab:hover a {
+    background-color: #e60000;    
+} 
 #activities-list {
     display: flex;
     flex-direction: column;
@@ -609,12 +619,20 @@ nav.tabs {
     align-items: center;
     padding: 7px;
     height: 36px;
+    border-bottom: 1px solid #d6d6d6;
+}
+#activities-list li:nth-child(even) {
+    background-color: #f2f2f2
 }
 #activities-list .name {
     flex-grow: 1;
 }
 #activities-list .add {
     font-weight: bold;
+    user-select: none;
+}
+#activities-list .time {
+    color: #006dff;
 }
 #activities-list .add,
 #activities-list .time {
@@ -623,6 +641,11 @@ nav.tabs {
 #activities-list .add,
 #activities-list .finish {
     cursor: pointer;
+    color: #4a4a4a;
+}
+#activities-list .add:hover,
+#activities-list .finish:hover {
+    color: #000;
 }
 #activities-list .finish {
     flex-basis: 20px;

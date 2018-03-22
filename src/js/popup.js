@@ -2,7 +2,7 @@ import $ from 'jquery';
 import Clipboard from 'clipboard';
 import normalizeUrl from 'normalize-url';
 import OptionsSync from 'webext-options-sync';
-import { getNotificationCounts, getUserData } from './steam/user';
+import { getUserData } from './steam/user';
 import { localizeHTML } from './libs/localization';
 import { on as onMessage } from './libs/messaging';
 import { parseDataFromHTML } from './steam/parser';
@@ -15,20 +15,22 @@ const saveTemplate = (type, value) => pushElement(`templates-${type}`, value);
 const removeTemplate = (type, index) => removeElement(`templates-${type}`, index);
 const getTemplate = (type, index) => getElement(`templates-${type}`, index);
 
-const fillPage = (user) => {
+const fillPage = ({
+    onlineState, personaName, stateMessage, id64, avatar
+}) => {
     // class offline, online, in-game
-    $('.user').addClass(user.onlineState);
+    $('.user').addClass(onlineState);
 
     const $username = $('.user .username');
-    if ($username.text(user.personaName).width() > 300) {
+    if ($username.text(personaName).width() > 300) {
         $username.css('font-size', '18px');
     } else {
         $username.css('font-size', '25px');
     }
 
-    $('.user .state-message').html(user.stateMessage);
-    $('.user .id64 button').attr('data-clipboard-text', user.id64);
-    $('.user .avatar img, .preview').attr('src', user.avatar);
+    $('.user .state-message').html(stateMessage);
+    $('.user .id64 button').attr('data-clipboard-text', id64);
+    $('.user .avatar img, .preview').attr('src', avatar);
 };
 
 const start = ({ user, options }) => {
@@ -40,15 +42,8 @@ const start = ({ user, options }) => {
     // options
     const audioVolume = options.audioVolume / 100;
 
+    // this value will be updated by changeName func (when we use it)
     let { personaName } = user;
-
-    // localize HTML
-    localizeHTML(document.getElementById('unlocalizedPage').textContent, 'body');
-    // fill page with data
-    fillPage(user);
-    // hide animation
-    $('body').addClass('loaded');
-
 
     // ID64
     (new Clipboard('.id64 button')).on('success', (e) => {
@@ -59,6 +54,7 @@ const start = ({ user, options }) => {
     const btnShowLoading = $btn => $btn.prop('disabled', true).addClass('loading');
     const btnHideLoading = $btn => $btn.prop('disabled', false).removeClass('loading');
 
+    // return 0 when we "hide" time
     const getTime = (fieldset) => {
         const time = $(`${fieldset} input[type=time]`)[0].valueAsNumber / 1000;
         const hasTime = $(`${fieldset} .js-has-time`).is(':checked');
@@ -177,8 +173,8 @@ const start = ({ user, options }) => {
 
 
     // TEMPLATES
-    const renderTemplatesPanel = async (type) => {
-        $('#templates-panel .templates').html(await renderTemplatesTable(type));
+    const renderTemplatesPanel = async (type, data) => {
+        $('#templates-panel .templates').html(await renderTemplatesTable(type, data));
     };
     $('.tabs a[href="#templates-name"], .tabs a[href="#templates-group"]')
         .click(function (e) {
@@ -233,16 +229,18 @@ const start = ({ user, options }) => {
         if (!loaded) {
             loaded = true;
             playAudio('../audio/1.mp3', audioVolume);
-            const data = await renderDonateData();
-            $('#donate-panel .donators ul').html(data.users);
-            $('#donate-panel .donate .referrals').append(data.referrals);
+
+            const { users, referrals } = await renderDonateData();
+            $('#donate-panel .donators ul').html(users);
+            $('#donate-panel .donate .referrals').append(referrals);
         }
     });
 
     $('#donate-panel .cash li a').click((e) => {
-        playAudio('../audio/2.mp3', audioVolume);
-        setTimeout(() => openInNewTab('https://goo.gl/xKtbiU'), 2500);
         e.preventDefault();
+
+        setTimeout(() => openInNewTab('https://goo.gl/xKtbiU'), 2500);
+        playAudio('../audio/2.mp3', audioVolume);
     });
 
     (new Clipboard('.share a[data-clipboard-text]')).on('success', (e) => {
@@ -254,25 +252,29 @@ const start = ({ user, options }) => {
     const renderActivities = () => {
         const { cache } = renderActivities;
 
-        activities.forEach((activity) => {
-            if (cache[activity.timer.id]) {
-                cache[activity.timer.id].children('.time').text(`${activity.seconds}s`);
+        $.each(activities, (i, activity) => {
+            const { timer, seconds, timer: { id } } = activity;
+
+            if (cache[id]) {
+                cache[id].children('.time').text(`${seconds}s`);
             } else {
                 const $li = $(renderActivity(activity));
-                cache[activity.timer.id] = $li;
+                $li.data('id', id);
+
+                cache[id] = $li;
                 $activitiesList.append($li);
 
                 // delete if expired
-                activity.timer.onFinish(() => {
-                    cache[activity.timer.id].remove();
-                    delete cache[activity.timer.id];
+                timer.onFinish(() => {
+                    cache[id].remove();
+                    delete cache[id];
 
                     if ($.isEmptyObject(cache)) {
-                        $('.tabs a[href="#activities"]').css('display', 'none');
+                        $('.tabs').removeClass('activities');
                     }
                 });
                 // show activities tab
-                $('.tabs a[href="#activities"]').css('display', 'block');
+                $('.tabs').addClass('activities');
             }
         });
     };
@@ -284,12 +286,12 @@ const start = ({ user, options }) => {
         }
     });
     $activitiesList.on('click', 'li .finish', function () {
-        const index = $(this).parent().index();
-        activities[index].timer.finish();
+        const id = $(this).parent().data('id');
+        activities[id].timer.finish();
     });
     $activitiesList.on('click', 'li .add', function () {
-        const index = $(this).parent().index();
-        activities[index].timer.addMoreTime(10);
+        const id = $(this).parent().data('id');
+        activities[id].timer.addMoreTime(10);
     });
 
     // Tabs
@@ -325,6 +327,13 @@ const getData = async () => {
     }
 
     await waitDocument();
+
+    // localize HTML
+    localizeHTML($('#unlocalizedPage').text(), 'body');
+    // fill page with data
+    fillPage(user);
+    // hide animation
+    $('body').addClass('loaded');
 
     return { user, options };
 };
