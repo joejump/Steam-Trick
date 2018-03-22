@@ -4,6 +4,7 @@ import SteamSettings from './steam/SteamSettings';
 import CountDownTimer from './libs/CountDownTimer';
 // import setAvatar from './steam/set-avatar';
 import { send as sendMessage } from './libs/messaging';
+import { showNotification } from './libs/utils';
 
 // defaults options
 new OptionsSync().define({
@@ -13,6 +14,16 @@ new OptionsSync().define({
     }
 });
 
+chrome.runtime.onInstalled.addListener((details) => {
+    if (details.reason === 'install') {
+        chrome.runtime.openOptionsPage();
+    }
+    if (details.reason === 'update') {
+        const thisVersion = chrome.runtime.getManifest().version;
+        showNotification(`Updated from ${details.previousVersion} to ${thisVersion}!`);
+    }
+});
+window.showNotification = showNotification;
 class SNCTimer extends CountDownTimer {
     constructor(time, mainProperties) {
         super(time);
