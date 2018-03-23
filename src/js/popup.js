@@ -21,7 +21,7 @@ const fillPage = ({
     // class offline, online, in-game
     $('.user').addClass(onlineState);
 
-    const $username = $('.user .username');
+    const $username = $('#username');
     if ($username.text(personaName).width() > 300) {
         $username.css('font-size', '18px');
     } else {
@@ -39,12 +39,6 @@ const start = ({ user, options }) => {
         joinToGroup, changeName, activities
     } = chrome.extension.getBackgroundPage().exports;
 
-    // options
-    const audioVolume = options.audioVolume / 100;
-
-    // this value will be updated by changeName func (when we use it)
-    let { personaName } = user;
-
     // ID64
     (new Clipboard('.id64 button')).on('success', (e) => {
         e.clearSelection();
@@ -58,6 +52,7 @@ const start = ({ user, options }) => {
     const getTime = (fieldset) => {
         const time = $(`${fieldset} input[type=time]`)[0].valueAsNumber / 1000;
         const hasTime = $(`${fieldset} .js-has-time`).is(':checked');
+
         return hasTime ? time : 0;
     };
 
@@ -108,10 +103,13 @@ const start = ({ user, options }) => {
     });
 
     // name-fieldset
-    const $plus = $('#name-fieldset .plus');
     const $nameField = $('#name-fieldset .js-field');
-    const deletePresentName = value =>
-        (value.startsWith(personaName) ? value.slice(personaName.length + 1) : value);
+    const $nameFieldPlus = $('#name-fieldset .plus');
+    const $username = $('#username');
+    const deletePresentName = (value) => {
+        const username = $username.text();
+        return value.startsWith(username) ? value.slice(username.length + 1) : value;
+    };
 
     $('#name-fieldset button').click(async function () {
         const time = getTime('#name-fieldset');
@@ -126,17 +124,14 @@ const start = ({ user, options }) => {
         const $this = $(this);
 
         // will be executed afrer request
-        const onload = (data) => {
+        const onload = () => {
             btnHideLoading($this);
-
-            // update data on page
-            fillPage(parseDataFromHTML(data));
 
             // save template
             if ($('#name-fieldset .js-save').is(':checked')) {
                 // we want to save only a "New Name"
                 const str = deletePresentName(newName);
-                const plus = $plus.is(':checked');
+                const plus = $nameFieldPlus.is(':checked');
 
                 saveTemplate('name', { name: str, time, plus });
             }
@@ -147,7 +142,7 @@ const start = ({ user, options }) => {
             const html = await changeName({
                 user: {
                     newName,
-                    personaName
+                    personaName: $username.text()
                 },
                 time,
                 onload
@@ -157,18 +152,18 @@ const start = ({ user, options }) => {
             const nickname = player.personaName;
 
             fillPage(player);
-            personaName = nickname;
+            $username.text(nickname);
         } catch (e) {
             showError(e);
             btnHideLoading($this);
         }
     });
-    $plus.change(() => {
+    $nameFieldPlus.change(() => {
         $nameField.val((i, value) =>
-            ($plus.is(':checked') ? `${personaName} ${value}` : deletePresentName(value)));
+            ($nameFieldPlus.is(':checked') ? `${$username.text()} ${value}` : deletePresentName(value)));
     });
     $nameField.keyup(() => {
-        $plus.prop('checked', $nameField.val().startsWith(personaName));
+        $nameFieldPlus.prop('checked', $nameField.val().startsWith($username.text()));
     });
 
 
@@ -197,8 +192,10 @@ const start = ({ user, options }) => {
     };
 
     const setNameTpl = ({ name, time, plus }) => {
+        const username = !plus ? name : `${$username.text()} ${name}`;
         setTime('#name-fieldset', time);
-        $nameField.val(!plus ? name : `${personaName} ${name}`);
+
+        $nameField.val(username);
         $nameField.trigger('keyup');
     };
     const setGroupTpl = ({ url, time }) => {
@@ -220,7 +217,7 @@ const start = ({ user, options }) => {
     // DONATE
     const playAudio = (src, volume) => {
         const audio = new Audio(src);
-        audio.volume = volume;
+        audio.volume = volume / 100;
         audio.play();
     };
 
@@ -228,7 +225,7 @@ const start = ({ user, options }) => {
     $('.tabs a[href="#donate-panel"]').click(async () => {
         if (!loaded) {
             loaded = true;
-            playAudio('../audio/1.mp3', audioVolume);
+            playAudio('../audio/1.mp3', options.audioVolume);
 
             const { users, referrals } = await renderDonateData();
             $('#donate-panel .donators ul').html(users);
@@ -240,7 +237,7 @@ const start = ({ user, options }) => {
         e.preventDefault();
 
         setTimeout(() => openInNewTab('https://goo.gl/xKtbiU'), 2500);
-        playAudio('../audio/2.mp3', audioVolume);
+        playAudio('../audio/2.mp3', options.audioVolume);
     });
 
     (new Clipboard('.share a[data-clipboard-text]')).on('success', (e) => {
@@ -253,11 +250,20 @@ const start = ({ user, options }) => {
         const { cache } = renderActivities;
 
         $.each(activities, (i, activity) => {
-            const { timer, seconds, timer: { id } } = activity;
+            const {
+                timer,
+                seconds,
+                oldName,
+                timer: { id }
+            } = activity;
 
             if (cache[id]) {
                 cache[id].children('.time').text(`${seconds}s`);
             } else {
+                if (oldName) {
+                    $username.text(oldName);
+                }
+
                 const $li = $(renderActivity(activity));
                 $li.data('id', id);
 

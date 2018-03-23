@@ -311,9 +311,6 @@ nav.tabs {
 .id64 > button:focus {
     animation-name: flash;
 }
-.user .info .username {
-    font-size: 25px;
-}
 
 .user .avatar a {
     display: block;

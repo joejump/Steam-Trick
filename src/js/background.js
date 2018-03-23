@@ -23,7 +23,7 @@ chrome.runtime.onInstalled.addListener((details) => {
         showNotification(`Updated from ${details.previousVersion} to ${thisVersion}!`);
     }
 });
-window.showNotification = showNotification;
+
 class SNCTimer extends CountDownTimer {
     constructor(time, mainProperties) {
         super(time);
@@ -147,13 +147,21 @@ changeName.cache = {
 };
 
 // const changeAvatar = async ({ blob, user, onload }) => {
-//     if (blob.size < 1048576) {
-//         const images = await setAvatar(blob, user);
-//         if (onload) onload();
-//         return images;
-//     }
-//     throw new Error('MAX FILE SIZE');
+//     const images = await setAvatar({ blob, user });
+//     if (onload) onload();
+//     return images;
 // };
+
+
+// chrome.contextMenus.create({
+//     title: 'Set as avatar',
+//     contexts: ['image'],
+//     onclick(e) {
+//         if (e.mediaType === 'image') {
+//
+//         }
+//     }
+// });
 
 // This functions will be available in popup window
 window.exports = {
