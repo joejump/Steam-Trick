@@ -50,16 +50,16 @@ const start = ({ user, options }) => {
 
     // return 0 when we "hide" time
     const getTime = (fieldset) => {
-        const time = $(`${fieldset} input[type=time]`)[0].valueAsNumber / 1000;
+        const time = $(`${fieldset} input[type=time]`)[0].valueAsNumber;
         const hasTime = $(`${fieldset} .js-has-time`).is(':checked');
 
-        return hasTime ? time : 0;
+        return hasTime ? (time / 1000) : 0;
     };
 
     // Valid time is 0 or greater 10
-    const checkTime = (selector, time) => {
+    const checkTime = (fieldset, time) => {
         if (Number.isNaN(time) || (time < 10 && time !== 0)) {
-            $(selector)[0].reportValidity();
+            $(`${fieldset} input[type=time]`)[0].reportValidity();
             return false;
         }
         return true;
@@ -72,7 +72,7 @@ const start = ({ user, options }) => {
 
         // validation
         if (
-            !checkTime('#group-fieldset input[type=time]', time) ||
+            !checkTime('#group-fieldset', time) ||
             !$groupField[0].reportValidity()
         ) { return; }
 
@@ -106,6 +106,7 @@ const start = ({ user, options }) => {
     const $nameField = $('#name-fieldset .js-field');
     const $nameFieldPlus = $('#name-fieldset .plus');
     const $username = $('#username');
+
     const deletePresentName = (value) => {
         const username = $username.text();
         return value.startsWith(username) ? value.slice(username.length + 1) : value;
@@ -116,7 +117,7 @@ const start = ({ user, options }) => {
 
         // validation
         if (
-            !checkTime('#name-fieldset input[type=time]', time) ||
+            !checkTime('#name-fieldset', time) ||
             !$nameField[0].reportValidity()
         ) { return; }
 
@@ -175,24 +176,24 @@ const start = ({ user, options }) => {
         .click(function (e) {
             const type = this.hash.replace('#templates-', '');
             renderTemplatesPanel(type);
+
             e.preventDefault();
         });
-    $('#templates-panel .templates').on('click', '.remove', async function (e) {
-        e.stopPropagation();
-        const index = $(this).parent('tr').index() - 1;
-        const type = $(this).parents('.templates table').attr('class');
 
-        const templates = await removeTemplate(type, index);
-        renderTemplatesPanel(type, templates);
-    });
     // If time is 0 we want to hide time input
     const setTime = (fieldset, time) => {
-        $(`${fieldset} .js-has-time`).prop('checked', time !== 0);
-        $(`${fieldset} input[type=time]`)[0].valueAsNumber = time * 1000;
+        const hasTime = time !== 0;
+        const value = time * 1000;
+
+        $(`${fieldset} .js-has-time`).prop('checked', hasTime);
+        $(`${fieldset} input[type=time]`)[0].valueAsNumber = value;
     };
 
     const setNameTpl = ({ name, time, plus }) => {
-        const username = !plus ? name : `${$username.text()} ${name}`;
+        const username = !plus
+            ? name
+            : `${$username.text()} ${name}`;
+
         setTime('#name-fieldset', time);
 
         $nameField.val(username);
@@ -202,15 +203,28 @@ const start = ({ user, options }) => {
         setTime('#group-fieldset', time);
         $groupField.val(url);
     };
+
     // fill inputs
     $('#templates-panel').on('click', '.name tr, .group tr', async function () {
-        const type = $(this).parents('.templates table').attr('class');
+        const type = $(this).parents('.templates table').data('type');
         const index = $(this).index() - 1;
         const tpl = await getTemplate(type, index);
 
         if (type === 'name') { setNameTpl(tpl); }
         if (type === 'group') { setGroupTpl(tpl); }
+
+        // open main panel
         $('a[href="#main-panel"]').trigger('click');
+    });
+
+    $('#templates-panel .templates').on('click', '.remove', async function (e) {
+        const index = $(this).parent('tr').index() - 1;
+        const type = $(this).parents('.templates table').data('type');
+
+        const templates = await removeTemplate(type, index);
+        renderTemplatesPanel(type, templates);
+
+        e.stopPropagation();
     });
 
 

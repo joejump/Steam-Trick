@@ -6,27 +6,27 @@
         "jquery": "^3.3.1",
         "localforage": "^1.6.0",
         "normalize-url": "^2.0.1",
-        "webext-options-sync": "^0.15.0"
+        "webext-options-sync": "^0.15.1"
     },
     "devDependencies": {
         "clean-webpack-plugin": "^0.1.19",
         "copy-webpack-plugin": "^4.5.1",
-        "cross-env": "^5.1.4",
-        "eslint": "^4.18.2",
+        "eslint": "^4.19.1",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-plugin-import": "^2.9.0",
-        "web-ext": "^2.5.0",
-        "imagemin-webpack-plugin": "^2.1.0",
-        "uglifyjs-webpack-plugin": "^1.2.3",
-        "webpack": "^3.11.0"
+        "imagemin-webpack-plugin": "^2.1.1",
+        "uglifyjs-webpack-plugin": "^1.2.4",
+        "web-ext": "^2.6.0",
+        "webpack": "^4.4.1",
+        "webpack-cli": "^2.0.13"
     },
     "scripts": {
         "test": "web-ext lint -s dist",
         "run:firefox": "web-ext run -s dist",
-        "start": "cross-env NODE_ENV=dev webpack --progress --hide-modules --watch --env.browser",
-        "build": "cross-env NODE_ENV=dev webpack --progress --hide-modules --env.browser",
-        "build:prod": "cross-env NODE_ENV=prod webpack --progress --hide-modules --env.browser",
-        "pack:firefox": "cross-env NODE_ENV=dev web-ext build -s dist -a artifacts",
+        "start": "webpack --mode development --progress --hide-modules --watch",
+        "build": "webpack --mode development --progress --hide-modules",
+        "build:prod": "webpack --mode production --progress --hide-modules",
+        "pack:firefox": "web-ext build -s dist -a artifacts",
         "lint": "eslint src/**/*.js webpack.config.js"
     },
     "author": "",

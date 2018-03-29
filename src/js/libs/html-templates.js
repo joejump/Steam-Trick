@@ -24,7 +24,7 @@ export const renderTemplatesTable = async (type, data) => {
     }
 
     templates.forEach(iterate);
-    return `<table class="${type}">${table}</table>`;
+    return `<table class="${type}" data-type="${type}">${table}</table>`;
 };
 
 export const renderDonateData = async () => {

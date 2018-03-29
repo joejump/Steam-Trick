@@ -1,9 +1,8 @@
 import OptionsSync from 'webext-options-sync';
 import SteamGroup from './steam/SteamGroup';
 import SteamSettings from './steam/SteamSettings';
-import CountDownTimer from './libs/CountDownTimer';
+import SNCTimer from './libs/SNCTimer';
 // import setAvatar from './steam/set-avatar';
-import { send as sendMessage } from './libs/messaging';
 import { showNotification } from './libs/utils';
 
 // defaults options
@@ -24,55 +23,6 @@ chrome.runtime.onInstalled.addListener((details) => {
     }
 });
 
-class SNCTimer extends CountDownTimer {
-    constructor(time, mainProperties) {
-        super(time);
-        this.propertyes = mainProperties;
-
-        // identify timer by id
-        this.id = SNCTimer.activitiesId;
-        SNCTimer.activitiesId += 1;
-
-        super.onTick((seconds) => {
-            this.propertyes.seconds = seconds;
-            sendMessage({ type: 'activities-list' });
-        });
-        this.onFinishFunc = [];
-    }
-    async start() {
-        const obj = Object.assign(this.propertyes, { timer: this });
-        SNCTimer.activities[this.id] = obj;
-
-        await super.start();
-
-        delete SNCTimer.activities[this.id];
-
-        this.onFinishFunc.forEach(fun => fun.call(this));
-    }
-
-    addMoreTime(time) {
-        this.duration += parseInt(time, 10);
-        return this.duration;
-    }
-
-    async finish() {
-        this.duration = 0;
-        await this._promise;
-        return this;
-    }
-    onFinish(fun) {
-        this.onFinishFunc.push(fun);
-    }
-
-    stop() {
-        this.stopped = true;
-        return this.finish();
-    }
-}
-// list of started actions
-SNCTimer.activities = {};
-SNCTimer.activitiesId = 0;
-
 const joinToGroup = async ({
     time, url, user, onload
 }) => {
@@ -92,7 +42,7 @@ const joinToGroup = async ({
 };
 
 const changeName = async ({
-    time, user: { newName, personaName }, onload
+    time, user: { newName, personaName: oldName }, onload
 }) => {
     const { cache } = changeName;
     const steamSettings = new SteamSettings({ personaName: newName });
@@ -114,7 +64,7 @@ const changeName = async ({
         return html;
     }
 
-    if (!cache.oldName) cache.oldName = personaName;
+    if (!cache.oldName) cache.oldName = oldName;
 
     const mainProperties = {
         type: 'name',
@@ -146,28 +96,10 @@ changeName.cache = {
     timer: null
 };
 
-// const changeAvatar = async ({ blob, user, onload }) => {
-//     const images = await setAvatar({ blob, user });
-//     if (onload) onload();
-//     return images;
-// };
-
-
-// chrome.contextMenus.create({
-//     title: 'Set as avatar',
-//     contexts: ['image'],
-//     onclick(e) {
-//         if (e.mediaType === 'image') {
-//
-//         }
-//     }
-// });
-
 // This functions will be available in popup window
 window.exports = {
     joinToGroup,
     changeName,
-    // changeAvatar,
     activities: SNCTimer.activities
 };
 

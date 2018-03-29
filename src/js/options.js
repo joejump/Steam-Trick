@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import OptionsSync from 'webext-options-sync';
 import getWebApiKey from './steam/steam-web-api-key';
-
+import { showError } from './libs/utils';
+// TODO: check auth
 $(document).ready(() => {
     const optionsSync = new OptionsSync();
     optionsSync.syncForm('#options-form');
@@ -26,9 +27,13 @@ $(document).ready(() => {
 
     const setApiKey = async () => {
         const $keyField = $('#apikey');
-        const key = await getWebApiKey();
 
-        $keyField.val(key);
+        try {
+            const key = await getWebApiKey();
+            $keyField.val(key);
+        } catch (e) {
+            showError(e);
+        }
         // FIXME: update value in storage
         optionsSync._handleFormUpdates({ target: $keyField[0] });
     };
