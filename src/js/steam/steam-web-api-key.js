@@ -1,5 +1,5 @@
 import api from '../libs/api';
-import { getSessionId } from './steam-utils';
+import { getSessionId, checkAuth } from './steam-utils';
 
 const parseKey = (html) => {
     if (html.querySelector('#mainContents h2').textContent === 'Access Denied') {
@@ -26,6 +26,8 @@ const registerkey = async (sessionId) => {
 };
 
 export default async () => {
+    await checkAuth();
+
     const sessionId = await getSessionId();
     const key = await getKey() || await registerkey(sessionId);
 

@@ -48,22 +48,14 @@ module.exports = () => {
             path: path.join(__dirname, DIST_FOLDER),
             filename: '[name].js'
         },
+
         plugins: [
             new CopyWebpackPlugin(staticFilesPath)
         ],
         optimization: {
             concatenateModules: true,
             minimizer: [
-                new UglifyJSPlugin({
-                    uglifyOptions: {
-                        mangle: false,
-                        compress: false,
-                        output: {
-                            beautify: true,
-                            indent_level: 2 // eslint-disable-line camelcase
-                        }
-                    }
-                }),
+                new UglifyJSPlugin(),
                 new ImageminPlugin({
                     pngquant: {
                         quality: '95-100'

@@ -215,16 +215,17 @@ const start = ({ user, options }) => {
 
         // open main panel
         $('a[href="#main-panel"]').trigger('click');
+        $(`#${type}-fieldset .js-save`).prop('checked', false);
     });
 
     $('#templates-panel .templates').on('click', '.remove', async function (e) {
+        e.stopPropagation();
+
         const index = $(this).parent('tr').index() - 1;
         const type = $(this).parents('.templates table').data('type');
 
         const templates = await removeTemplate(type, index);
         renderTemplatesPanel(type, templates);
-
-        e.stopPropagation();
     });
 
 

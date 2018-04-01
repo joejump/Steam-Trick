@@ -4,6 +4,7 @@ import SteamSettings from './steam/SteamSettings';
 import SNCTimer from './libs/SNCTimer';
 // import setAvatar from './steam/set-avatar';
 import { showNotification } from './libs/utils';
+import { pushElement } from './libs/storage';
 
 // defaults options
 new OptionsSync().define({
@@ -20,6 +21,35 @@ chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'update') {
         const thisVersion = chrome.runtime.getManifest().version;
         showNotification(`Updated from ${details.previousVersion} to ${thisVersion}!`);
+
+        // compatibility with previous version
+        if (details.previousVersion === '1.2.0.2') {
+            chrome.storage.local.get(({ templates }) => {
+                templates.forEach((template) => {
+                    const { type } = template;
+                    const time = (template.time === null) ? 0 : template.time;
+
+                    if (template.type === 'name') {
+                        const { newName: name, myAndNew: plus } = template;
+
+                        pushElement(`templates-${type}`, {
+                            name,
+                            time,
+                            plus
+                        });
+                    }
+                    if (template.type === 'group') {
+                        const { url: groupName, url } = template;
+
+                        pushElement(`templates-${type}`, {
+                            groupName,
+                            time,
+                            url: `https://steamcommunity.com/groups/${url}`
+                        });
+                    }
+                });
+            });
+        }
     }
 });
 
