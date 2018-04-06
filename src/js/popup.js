@@ -172,7 +172,7 @@ const start = ({ user, options }) => {
     const renderTemplatesPanel = async (type, data) => {
         $('#templates-panel .templates').html(await renderTemplatesTable(type, data));
     };
-    $('.tabs a[href="#templates-name"], .tabs a[href="#templates-group"]')
+    $('.tabs a[href^="#templates-"]')
         .click(function (e) {
             const type = this.hash.replace('#templates-', '');
             renderTemplatesPanel(type);
@@ -212,6 +212,10 @@ const start = ({ user, options }) => {
 
         if (type === 'name') { setNameTpl(tpl); }
         if (type === 'group') { setGroupTpl(tpl); }
+
+        if (options.quickSet) {
+            $(`#${type}-fieldset button`).trigger('click');
+        }
 
         // open main panel
         $('a[href="#main-panel"]').trigger('click');

@@ -1,55 +1,25 @@
 import OptionsSync from 'webext-options-sync';
+import normalizeUrl from 'normalize-url';
 import SteamGroup from './steam/SteamGroup';
 import SteamSettings from './steam/SteamSettings';
 import SNCTimer from './libs/SNCTimer';
 // import setAvatar from './steam/set-avatar';
-import { showNotification } from './libs/utils';
+import { showNotification, showError } from './libs/utils';
 import { pushElement } from './libs/storage';
+import createContextMenu from './libs/context-menu';
+import { isSteamGroup } from './steam/steam-utils';
+import { getUserData } from './steam/user';
 
 // defaults options
 new OptionsSync().define({
     defaults: {
         audioVolume: '40',
-        sourceType: 'xml'
-    }
-});
+        sourceType: 'xml',
+        quickSet: false,
+        contextMenu: true,
 
-chrome.runtime.onInstalled.addListener((details) => {
-    if (details.reason === 'install') {
-        chrome.runtime.openOptionsPage();
-    }
-    if (details.reason === 'update') {
-        const thisVersion = chrome.runtime.getManifest().version;
-        showNotification(`Updated from ${details.previousVersion} to ${thisVersion}!`);
-
-        // compatibility with previous version
-        if (details.previousVersion === '1.2.0.2') {
-            chrome.storage.local.get(({ templates }) => {
-                templates.forEach((template) => {
-                    const { type } = template;
-                    const time = (template.time === null) ? 0 : template.time;
-
-                    if (template.type === 'name') {
-                        const { newName: name, myAndNew: plus } = template;
-
-                        pushElement(`templates-${type}`, {
-                            name,
-                            time,
-                            plus
-                        });
-                    }
-                    if (template.type === 'group') {
-                        const { url: groupName, url } = template;
-
-                        pushElement(`templates-${type}`, {
-                            groupName,
-                            time,
-                            url: `https://steamcommunity.com/groups/${url}`
-                        });
-                    }
-                });
-            });
-        }
+        'context-template-group-time': 0,
+        saveTemplateAsk: true
     }
 });
 
@@ -132,5 +102,82 @@ window.exports = {
     changeName,
     activities: SNCTimer.activities
 };
+
+
+const initContextMenu = async () => {
+    const { contextMenu } = await new OptionsSync().getAll();
+    if (!contextMenu) { return; }
+
+    createContextMenu();
+    // Add click event
+    chrome.contextMenus.onClicked.addListener(async ({ menuItemId, linkUrl, srcUrl }) => {
+        try {
+            const options = await new OptionsSync().getAll();
+
+            if (menuItemId === 'group') {
+                const url = normalizeUrl(linkUrl, { removeQueryParameters: [/[\s\S]+/i] });
+                if (!isSteamGroup(url)) {
+                    throw new Error('Not a steam group');
+                }
+
+                const user = await getUserData(options.sourceType, options.apikey);
+                const time = options['context-template-group-time'];
+
+                joinToGroup({
+                    url,
+                    time,
+                    user
+                });
+            }
+
+            if (menuItemId === 'avatar') {
+                console.log(srcUrl);
+            }
+        } catch (e) {
+            showError(e);
+        }
+    });
+};
+
+initContextMenu();
+
+chrome.runtime.onInstalled.addListener((details) => {
+    if (details.reason === 'install') {
+        chrome.runtime.openOptionsPage();
+    }
+    if (details.reason === 'update') {
+        const thisVersion = chrome.runtime.getManifest().version;
+        showNotification(`Updated from ${details.previousVersion} to ${thisVersion}!`);
+
+        // compatibility with previous version
+        if (details.previousVersion === '1.2.0.2') {
+            chrome.storage.local.get(({ templates }) => {
+                templates.forEach((template) => {
+                    const { type } = template;
+                    const time = (template.time === null) ? 0 : template.time;
+
+                    if (template.type === 'name') {
+                        const { newName: name, myAndNew: plus } = template;
+
+                        pushElement(`templates-${type}`, {
+                            name,
+                            time,
+                            plus
+                        });
+                    }
+                    if (template.type === 'group') {
+                        const { url: groupName, url } = template;
+
+                        pushElement(`templates-${type}`, {
+                            groupName,
+                            time,
+                            url: `https://steamcommunity.com/groups/${url}`
+                        });
+                    }
+                });
+            });
+        }
+    }
+});
 
 chrome.browserAction.setBadgeText({ text: '' });

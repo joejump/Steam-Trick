@@ -24,3 +24,5 @@ export const checkError = (html, selector) => {
     }
     return Promise.resolve(html);
 };
+
+export const isSteamGroup = url => /(https?:\/\/)?steamcommunity\.com\/groups\/[\s\S]+/i.test(url);

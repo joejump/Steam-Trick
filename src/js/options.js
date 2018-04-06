@@ -15,6 +15,12 @@ $(document).ready(() => {
         } else {
             $('.apikey-block').hide();
         }
+
+        if (options.contextMenu) {
+            $('.context-menu-template').show();
+        } else {
+            $('.context-menu-template').hide();
+        }
     };
 
     // Hide or show optional fields

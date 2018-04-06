@@ -11,6 +11,7 @@
     .option  {
         display: flex;
         justify-content: space-between;
+        align-items: center;
     }
 </style>
 <form id="options-form">
@@ -18,6 +19,34 @@
         <label class="option">
             <span class="property">Audio volume:</span>
             <input class="value" type="range" name="audioVolume">
+        </label>
+    </p>
+    <p>
+        <label class="option">
+            <span class="property">Apply template after click:</span>
+            <input class="value" type="checkbox" name="quickSet">
+        </label>
+    </p>
+    <p>
+        <label class="option">
+            <span class="property">Context menu:</span>
+            <input class="value" type="checkbox" name="contextMenu">
+        </label>
+    </p>
+    <p class="context-menu-template">
+        <label class="option">
+            <span class="property">Context menu template (group):</span>
+            <span>
+                <label>
+                    Time: <input title="0 = disabled" type="number" name="context-template-group-time">
+                </label>
+            </span>
+        </label>
+    </p>
+    <p class="context-menu-template">
+        <label class="option">
+            <span class="property">Context menu: Ask to save template:</span>
+            <input class="value" type="checkbox" name="saveTemplateAsk">
         </label>
     </p>
     <p class="sourceType">
