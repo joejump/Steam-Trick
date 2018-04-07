@@ -25,7 +25,8 @@ a {
 body {
 	height: 350px;
 	width: 410px;
-	overflow: hidden;
+	margin: 0 auto;
+ 	overflow: hidden;
 	font-family: var(--main-font);
 	font-size: 14px;
 	background-color: #fff;

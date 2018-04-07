@@ -1,13 +1,12 @@
-import api from '../libs/api';
-import { getSessionId } from './steam-utils';
+import { getSessionId, getId64 } from './steam-utils';
 
-
-const setAvatar = async ({ blob, id64 }) => {
+export default async ({ blob }) => {
     const MAX_FILE_SIZE = 1048576;
     if (blob.size > MAX_FILE_SIZE) {
         throw new Error(`Max image size is ${MAX_FILE_SIZE / 1000}kb`);
     }
     const sessionid = await getSessionId();
+    const id64 = await getId64();
 
     const formData = new FormData();
     formData.append('MAX_FILE_SIZE', MAX_FILE_SIZE);
@@ -18,7 +17,13 @@ const setAvatar = async ({ blob, id64 }) => {
     formData.append('json', 1);
     formData.append('avatar', blob);
 
-    const json = await api.post('https://steamcommunity.com/actions/FileUploader', formData);
+    const data = await fetch('https://steamcommunity.com/actions/FileUploader', {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+    });
+
+    const json = await data.json();
 
     // if success return new images (full, medium, 0);
     if (!json.success) {
@@ -27,4 +32,3 @@ const setAvatar = async ({ blob, id64 }) => {
     return json.images;
 };
 
-export default setAvatar;

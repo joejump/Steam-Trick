@@ -8,10 +8,14 @@
         justify-content: space-around;
         align-items: center;
     }
-    .option  {
+    .option {
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    input[name="context-template-group-time" ] {
+        width: 60px;
+        margin-right: 5px;
     }
 </style>
 <form id="options-form">
@@ -38,7 +42,7 @@
             <span class="property">Context menu template (group):</span>
             <span>
                 <label>
-                    Time: <input title="0 = disabled" type="number" name="context-template-group-time">
+                    Time: <input title="0 = disabled" type="number" name="context-template-group-time">s
                 </label>
             </span>
         </label>

@@ -1,14 +1,11 @@
 import OptionsSync from 'webext-options-sync';
-import normalizeUrl from 'normalize-url';
 import SteamGroup from './steam/SteamGroup';
 import SteamSettings from './steam/SteamSettings';
 import SNCTimer from './libs/SNCTimer';
-// import setAvatar from './steam/set-avatar';
-import { showNotification, showError } from './libs/utils';
+import { showNotification } from './libs/utils';
 import { pushElement } from './libs/storage';
 import createContextMenu from './libs/context-menu';
-import { isSteamGroup } from './steam/steam-utils';
-import { getUserData } from './steam/user';
+import setAvatar from './steam/set-avatar';
 
 // defaults options
 new OptionsSync().define({
@@ -100,6 +97,7 @@ changeName.cache = {
 window.exports = {
     joinToGroup,
     changeName,
+    setAvatar,
     activities: SNCTimer.activities
 };
 
@@ -109,34 +107,6 @@ const initContextMenu = async () => {
     if (!contextMenu) { return; }
 
     createContextMenu();
-    // Add click event
-    chrome.contextMenus.onClicked.addListener(async ({ menuItemId, linkUrl, srcUrl }) => {
-        try {
-            const options = await new OptionsSync().getAll();
-
-            if (menuItemId === 'group') {
-                const url = normalizeUrl(linkUrl, { removeQueryParameters: [/[\s\S]+/i] });
-                if (!isSteamGroup(url)) {
-                    throw new Error('Not a steam group');
-                }
-
-                const user = await getUserData(options.sourceType, options.apikey);
-                const time = options['context-template-group-time'];
-
-                joinToGroup({
-                    url,
-                    time,
-                    user
-                });
-            }
-
-            if (menuItemId === 'avatar') {
-                console.log(srcUrl);
-            }
-        } catch (e) {
-            showError(e);
-        }
-    });
 };
 
 initContextMenu();
