@@ -571,9 +571,27 @@ nav.tabs {
 	background-color: #dcdcdc;
 }
 
-.templates table.image img {
-	width: 75px;
-	height: 75px;
+.templates .avatar {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+.templates .avatar .item {
+	position: relative;
+	margin-left: 5px;
+	margin-bottom: 5px;
+	cursor: pointer;
+}
+.templates .avatar .item .remove {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 16px;
+    color: white;
+}
+.templates .avatar img {
+    width: 120px;
+    height: 120px;
 	object-fit: cover;
 }
 

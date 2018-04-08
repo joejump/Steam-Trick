@@ -6,8 +6,9 @@ import { pushElement } from './storage';
 import { isSteamGroup } from '../steam/steam-utils';
 import { getUserData } from '../steam/user';
 
-const saveTemplate = (type, value) => {
-    if (window.confirm('Do you want to save template?')) {
+const saveTemplate = async (type, value) => {
+    const { saveTemplateAsk } = await new OptionsSync().getAll();
+    if (saveTemplateAsk && window.confirm('Do you want to save template?')) {
         pushElement(`templates-${type}`, value);
     }
 };
@@ -77,7 +78,8 @@ export default () => {
                         origins: ['<all_urls>']
                     });
                 }
-                const blob = await api.get(srcUrl).then(body => body.blob());
+                const url = srcUrl || linkUrl;
+                const blob = await api.get(url).then(body => body.blob());
 
                 await setAvatar({ blob });
                 saveTemplate('avatar', { blob });

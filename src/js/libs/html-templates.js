@@ -4,35 +4,47 @@ import parseTime from './parse-time';
 
 const getTime = time => (time !== 0 ? parseTime(time) : '—');
 
-export const renderTemplatesTable = async (type, data) => {
+export const renderTemplates = async (type, data) => {
     const templates = data || await localForege.getItem(`templates-${type}`);
-    if (templates === null) { return '<div class="empty">storage is empty</div>'; }
 
-    const removing = '<td class="remove">&#x2716;</td>';
-    let table = '';
-    let iterate;
-    if (type === 'name') {
-        table += '<tr><th>Name</th><th class="time">Time</th><th class="symbol">+</th><th class="symbol">&#x2716;</th></tr>';
+    if (templates !== null) {
+        const removing = '<td class="remove">&#x2716;</td>';
 
-        iterate = ({ name, plus, time }) => {
-            table += `<tr><td title="${name}">${name}</td><td>${getTime(time)}</td><td>${plus ? '+' : '—'}</td>${removing}</tr>`;
-        };
-    } else if (type === 'group') {
-        table += '<tr><th>Name(URL)</th><th class="time">Time</th><th class="symbol">&#x2716;</th></tr>';
+        if (type === 'name') {
+            const th = '<tr><th>Name</th><th class="time">Time</th><th class="symbol">+</th><th class="symbol">&#x2716;</th></tr>';
+            const td = templates.reduce((prev, { name, plus, time }) =>
+                `${prev}<tr class="item">
+                    <td title="${name}">${name}</td>
+                    <td>${getTime(time)}</td>
+                    <td>${plus ? '+' : '—'}</td>
+                    <td class="remove">&#x2716;</td>
+                </tr>`, '');
 
-        iterate = ({ url, groupName, time }) => {
-            table += `<tr><td title="${url}">${groupName}</td><td>${getTime(time)}</td>${removing}</tr>`;
-        };
-    } else if (type === 'avatar') {
-        table += '<tr><thAvatar</th><th class="symbol">&#x2716;</th></tr>';
-        iterate = ({ blob }) => {
-            const avatar = URL.createObjectURL(blob);
-            table += `<tr><td title="Click to set"><img src="${avatar}"></td>${removing}</tr>`;
-        };
+            return `<table class="js-template name" data-type="name">${th}${td}</table>`;
+        }
+
+        if (type === 'group') {
+            const th = '<tr><th>Name(URL)</th><th class="time">Time</th><th class="symbol">&#x2716;</th></tr>';
+            const td = templates.reduce((prev, { url, groupName, time }) =>
+                `${prev}<tr class="item"><td title="${url}">${groupName}</td><td>${getTime(time)}</td>${removing}</tr>`, '');
+
+            return `<table class="js-template group" data-type="group">${th}${td}</table>`;
+        }
+
+        if (type === 'avatar') {
+            const images = templates.reduce((prev, { blob }) => {
+                const avatar = URL.createObjectURL(blob);
+
+                return `${prev}<div class="item" title="Click to set.">
+                    <img src="${avatar}">
+                    <span class="remove">&#x2716;</span>
+                </div>`;
+            }, '');
+            return `<div class="js-template avatar" data-type="avatar">${images}</div>`;
+        }
     }
 
-    templates.forEach(iterate);
-    return `<table class="${type}" data-type="${type}">${table}</table>`;
+    return '<div class="empty">storage is empty</div>';
 };
 
 export const renderDonateData = async () => {

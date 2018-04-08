@@ -9,7 +9,8 @@ import { parseDataFromHTML } from './steam/parser';
 import { openInNewTab, showError } from './libs/utils';
 import { checkAuth } from './steam/steam-utils';
 import { pushElement, removeElement, getElement } from './libs/storage';
-import { renderTemplatesTable, renderDonateData, renderActivity } from './libs/html-templates';
+import { renderTemplates, renderDonateData, renderActivity } from './libs/html-templates';
+import setAvatar from './steam/set-avatar';
 
 const saveTemplate = (type, value) => pushElement(`templates-${type}`, value);
 const removeTemplate = (type, index) => removeElement(`templates-${type}`, index);
@@ -30,7 +31,7 @@ const fillPage = ({
 
     $('.user .state-message').html(stateMessage);
     $('.user .id64 button').attr('data-clipboard-text', id64);
-    $('.user .avatar img, .preview').attr('src', avatar);
+    $('.user .avatar img').attr('src', avatar);
 };
 
 const start = ({ user, options }) => {
@@ -170,7 +171,7 @@ const start = ({ user, options }) => {
 
     // TEMPLATES
     const renderTemplatesPanel = async (type, data) => {
-        $('#templates-panel .templates').html(await renderTemplatesTable(type, data));
+        $('#templates-panel .templates').html(await renderTemplates(type, data));
     };
     $('.tabs a[href^="#templates-"]')
         .click(function (e) {
@@ -203,15 +204,21 @@ const start = ({ user, options }) => {
         setTime('#group-fieldset', time);
         $groupField.val(url);
     };
+    const setAvatarTpl = async (tpl) => {
+        const { medium } = await setAvatar(tpl);
+        $('.user .avatar img').attr('src', medium);
+    };
 
     // fill inputs
-    $('#templates-panel').on('click', '.name tr, .group tr', async function () {
-        const type = $(this).parents('.templates table').data('type');
-        const index = $(this).index() - 1;
+    $('#templates-panel').on('click', '.item', async function () {
+        const type = $(this).parents('.js-template').data('type');
+        const index = (type === 'avatar') ? $(this).index() : $(this).index() - 1;
+
         const tpl = await getTemplate(type, index);
 
         if (type === 'name') { setNameTpl(tpl); }
         if (type === 'group') { setGroupTpl(tpl); }
+        if (type === 'avatar') { setAvatarTpl(tpl); }
 
         if (options.quickSet) {
             $(`#${type}-fieldset button`).trigger('click');
