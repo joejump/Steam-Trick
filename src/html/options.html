@@ -13,7 +13,7 @@
         justify-content: space-between;
         align-items: center;
     }
-    input[name="context-template-group-time" ] {
+    input[type="number"] {
         width: 60px;
         margin-right: 5px;
     }
@@ -43,6 +43,19 @@
             <span>
                 <label>
                     Time: <input title="0 = disabled" type="number" name="context-template-group-time">s
+                </label>
+            </span>
+        </label>
+    </p>
+    <p class="context-menu-template">
+        <label class="option">
+            <span class="property">Context menu template (name):</span>
+            <span>
+                <label>
+                    Plus: <input title="Your name + new" type="checkbox" name="context-template-name-plus">
+                </label>
+                <label>
+                    Time: <input title="0 = disabled" type="number" name="context-template-name-time">s
                 </label>
             </span>
         </label>

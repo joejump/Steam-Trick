@@ -574,7 +574,6 @@ nav.tabs {
 .templates .avatar {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: center;
 }
 .templates .avatar .item {
 	position: relative;

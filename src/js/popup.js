@@ -232,11 +232,12 @@ const start = ({ user, options }) => {
     $('#templates-panel .templates').on('click', '.remove', async function (e) {
         e.stopPropagation();
 
-        const index = $(this).parent('tr').index() - 1;
-        const type = $(this).parents('.templates table').data('type');
+        const type = $(this).parents('.js-template').data('type');
+        const $item = $(this).parent('.item');
+        const index = (type === 'avatar') ? $item.index() : $item.index() - 1;
 
-        const templates = await removeTemplate(type, index);
-        renderTemplatesPanel(type, templates);
+        await removeTemplate(type, index);
+        renderTemplatesPanel(type);
     });
 
 

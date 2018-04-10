@@ -5,9 +5,9 @@ import parseTime from './parse-time';
 const getTime = time => (time !== 0 ? parseTime(time) : '—');
 
 export const renderTemplates = async (type, data) => {
-    const templates = data || await localForege.getItem(`templates-${type}`);
+    const templates = data || await localForege.getItem(`templates-${type}`) || [];
 
-    if (templates !== null) {
+    if (templates.length > 0) {
         const removing = '<td class="remove">&#x2716;</td>';
 
         if (type === 'name') {

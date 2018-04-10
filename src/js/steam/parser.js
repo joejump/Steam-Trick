@@ -25,7 +25,7 @@ export const parseDataFromXML = (xml) => {
     const avatar = $xml.find('avatarMedium:first').text();
     const stateMessage = $xml.find('stateMessage').text();
     const onlineState = $xml.find('onlineState').text();
-    const profileURL = `https://steamcommunity.com/${customURL ? `id/${customURL}` : `profiles/${id64}`}`;
+    const profileURL = `https://steamcommunity.com/${customURL ? `id/${customURL}` : `profiles/${id64}`}/`;
 
     return {
         profileURL,
@@ -39,11 +39,12 @@ export const parseDataFromXML = (xml) => {
 
 export const parseDataFromJSON = (player) => {
     const {
-        profileurl: profileURL,
         steamid: id64,
         personaname: personaName,
         avatarmedium: avatar
     } = player;
+
+    const profileURL = player.profileurl.replace('http://', 'https://');
 
     return {
         profileURL,

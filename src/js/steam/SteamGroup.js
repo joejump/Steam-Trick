@@ -25,7 +25,7 @@ export default class SteamGroup {
         fd.append('action', 'leaveGroup');
         fd.append('groupId', this.groupID64);
 
-        return api.post(`${this.user.profileURL}/home_process`, fd);
+        return api.post(`${this.user.profileURL}home_process`, fd);
     }
 
     _init() {

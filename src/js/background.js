@@ -16,6 +16,8 @@ new OptionsSync().define({
         contextMenu: true,
 
         'context-template-group-time': 0,
+        'context-template-name-time': 60,
+        'context-template-name-plus': true,
         saveTemplateAsk: true
     }
 });
@@ -114,7 +116,9 @@ initContextMenu();
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage();
+        createContextMenu();
     }
+
     if (details.reason === 'update') {
         const thisVersion = chrome.runtime.getManifest().version;
         showNotification(`Updated from ${details.previousVersion} to ${thisVersion}!`);

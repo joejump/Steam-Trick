@@ -15,7 +15,7 @@ const saveTemplate = async (type, value) => {
 
 export default () => {
     // background
-    const { joinToGroup, setAvatar } = window.exports;
+    const { joinToGroup, changeName, setAvatar } = window.exports;
 
     // Log creation status
     const onCreated = () => {
@@ -27,62 +27,103 @@ export default () => {
     // Create the context menu item.
     chrome.contextMenus.create({
         id: 'group',
-        title: 'Join to group',
+        title: 'Join To Group',
         contexts: ['selection', 'link']
     }, onCreated);
 
     chrome.contextMenus.create({
+        id: 'name',
+        title: 'Change Profile Name',
+        contexts: ['selection']
+    }, onCreated);
+
+    chrome.contextMenus.create({
         id: 'avatar',
-        title: 'Change avatar',
+        title: 'Change Avatar',
         contexts: ['image', 'link']
     }, onCreated);
+
+    const handleGroup = async (text, time, user) => {
+        const url = normalizeUrl(text, { removeQueryParameters: [/[\s\S]+/i] });
+
+        if (!isSteamGroup(url)) {
+            throw new Error('Not a steam group');
+        }
+
+        const onload = (groupName) => {
+            // save template
+            saveTemplate('group', { groupName, url, time });
+        };
+
+        await joinToGroup({
+            url,
+            time,
+            user,
+            onload
+        });
+    };
+
+    const handleAvatar = async (url) => {
+        try {
+            await containsPermissions({
+                origins: ['<all_urls>']
+            });
+        } catch (e) {
+            await permissionsRequest({
+                origins: ['<all_urls>']
+            });
+        }
+        const blob = await api.get(url).then(body => body.blob());
+
+        await setAvatar({ blob });
+        saveTemplate('avatar', { blob });
+    };
+
+    const handleName = async (name, time, user, plus) => {
+        const newName = plus ? `${user.personaName} ${name}` : name;
+
+        const onload = () => {
+            saveTemplate('name', { name, time, plus });
+        };
+
+        if (newName.length < 2 || newName.length > 32) {
+            throw new Error(chrome.i18n.getMessage('Namelength'));
+        }
+
+        await changeName({
+            user: {
+                newName,
+                personaName: user.personaName
+            },
+            time,
+            onload
+        });
+    };
 
     // Add click event
     chrome.contextMenus.onClicked.addListener(async ({
         menuItemId, linkUrl, srcUrl, selectionText
     }) => {
         try {
-            const options = await new OptionsSync().getAll();
-
-            if (menuItemId === 'group') {
-                const text = selectionText || linkUrl;
-                const url = normalizeUrl(text, { removeQueryParameters: [/[\s\S]+/i] });
-
-                if (!isSteamGroup(url)) {
-                    throw new Error('Not a steam group');
-                }
-
+            if (menuItemId === 'name' || menuItemId === 'group') {
+                const options = await new OptionsSync().getAll();
                 const user = await getUserData(options.sourceType, options.apikey);
-                const time = options['context-template-group-time'];
 
-                const onload = (groupName) => {
-                    // save template
-                    saveTemplate('group', { groupName, url, time });
-                };
+                if (menuItemId === 'group') {
+                    const time = options['context-template-group-time'];
 
-                await joinToGroup({
-                    url,
-                    time,
-                    user,
-                    onload
-                });
+                    await handleGroup((selectionText || linkUrl), time, user);
+                } else if (menuItemId === 'name') {
+                    const time = options['context-template-name-time'];
+                    const plus = options['context-template-name-plus'];
+
+                    await handleName(selectionText, time, user, plus);
+                }
             }
 
             if (menuItemId === 'avatar') {
-                try {
-                    await containsPermissions({
-                        origins: ['<all_urls>']
-                    });
-                } catch (e) {
-                    await permissionsRequest({
-                        origins: ['<all_urls>']
-                    });
-                }
                 const url = srcUrl || linkUrl;
-                const blob = await api.get(url).then(body => body.blob());
-
-                await setAvatar({ blob });
-                saveTemplate('avatar', { blob });
+                await handleAvatar(url);
             }
         } catch (e) {
             showError(e);
