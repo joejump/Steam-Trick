@@ -4,7 +4,7 @@ import SteamSettings from './steam/SteamSettings';
 import SNCTimer from './libs/SNCTimer';
 import { showNotification } from './libs/utils';
 import { pushElement } from './libs/storage';
-import createContextMenu from './libs/context-menu';
+import { create as createContextMenus } from './libs/context-menus';
 import setAvatar from './steam/set-avatar';
 
 // defaults options
@@ -108,7 +108,7 @@ const initContextMenu = async () => {
     const { contextMenu } = await new OptionsSync().getAll();
     if (!contextMenu) { return; }
 
-    createContextMenu();
+    createContextMenus();
 };
 
 initContextMenu();
@@ -116,7 +116,7 @@ initContextMenu();
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage();
-        createContextMenu();
+        createContextMenus();
     }
 
     if (details.reason === 'update') {

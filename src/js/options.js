@@ -1,7 +1,9 @@
 import $ from 'jquery';
 import OptionsSync from 'webext-options-sync';
 import getWebApiKey from './steam/steam-web-api-key';
-import { showError } from './libs/utils';
+import { showError, showNotification } from './libs/utils';
+import { create as createContextMenu, remove as removeContextMenus } from './libs/context-menus';
+
 // TODO: check auth
 $(document).ready(() => {
     const optionsSync = new OptionsSync();
@@ -44,10 +46,19 @@ $(document).ready(() => {
         optionsSync._handleFormUpdates({ target: $keyField[0] });
     };
 
-    $('select[name="sourceType"]').change(async function () {
+    $('select[name="sourceType"]').change(function () {
         if (this.value === 'json') {
             setApiKey();
         }
+    });
+
+    $('input[name="contextMenu"]').change(function () {
+        if (this.checked) {
+            createContextMenu();
+        } else {
+            removeContextMenus();
+        }
+        showNotification('You may need to restart your browser');
     });
 
     $('#get-key').click((e) => {

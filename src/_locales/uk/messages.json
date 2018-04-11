@@ -20,38 +20,11 @@
   "time": {
     "message": "Час"
   },
-  "m": {
-    "message": "хв"
-  },
-  "s": {
-    "message": "сек"
-  },
-  "change": {
-    "message": "Змінити"
-  },
-  "groupBtn": {
-    "message": "Долучитися"
-  },
-  "joinAndLeave": {
-    "message": "Долучитися і покинути"
-  },
-  "donate": {
-    "message": "Donate"
-  },
-  "top": {
-    "message": "Топ"
-  },
-  "andNew": {
-    "message": " + нове"
-  },
   "notGroup": {
     "message": "Це не група!"
   },
   "newName": {
     "message": "Нове ім'я"
-  },
-  "myNameAndNew": {
-    "message": "Моє ім'я і нове"
   },
   "groupUrl": {
     "message": "URL групи"
@@ -73,5 +46,17 @@
   },
   "upload": {
     "message": "Завантажити"
+  },
+  "saveQuestion": {
+    "message": "Ви хочете зберегти шаблон?"
+  },
+  "groupJoin": {
+    "message": "Приєднатися До Steam Групи"
+  },
+  "nameChange": {
+    "message": "Змінити ім'я профілю"
+  },
+  "avatarChange": {
+    "message": "Змінити Аватар"
   }
 }

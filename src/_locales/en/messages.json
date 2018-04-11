@@ -20,38 +20,11 @@
   "time": {
     "message": "Time"
   },
-  "m": {
-    "message": "m"
-  },
-  "s": {
-    "message": "s"
-  },
-  "change": {
-    "message": "Change"
-  },
-  "groupBtn": {
-    "message": "Join"
-  },
-  "joinAndLeave": {
-    "message": "Join and leave"
-  },
-  "donate": {
-    "message": "Donate"
-  },
-  "top": {
-    "message": "Top!"
-  },
-  "andNew": {
-    "message": " + new"
-  },
   "notGroup": {
     "message": "it's not a group"
   },
   "newName": {
     "message": "New name"
-  },
-  "myNameAndNew": {
-    "message": "My name and new"
   },
   "groupUrl": {
     "message": "Group URL"
@@ -73,5 +46,17 @@
   },
   "upload": {
     "message": "Upload"
+  },
+  "saveQuestion": {
+    "message": "Do you want to save template?"
+  },
+  "groupJoin": {
+    "message": "Join To Steam Group"
+  },
+  "nameChange": {
+    "message": "Change Nickname"
+  },
+  "avatarChange": {
+    "message": "Change Avatar"
   }
 }

@@ -6,48 +6,53 @@ import { pushElement } from './storage';
 import { isSteamGroup } from '../steam/steam-utils';
 import { getUserData } from '../steam/user';
 
-const saveTemplate = async (type, value) => {
-    const { saveTemplateAsk } = await new OptionsSync().getAll();
-    if (saveTemplateAsk && window.confirm('Do you want to save template?')) {
-        pushElement(`templates-${type}`, value);
+const contextMenus = [
+    {
+        id: 'group',
+        title: chrome.i18n.getMessage('groupJoin'),
+        contexts: ['selection', 'link']
+    },
+    {
+        id: 'name',
+        title: chrome.i18n.getMessage('nameChange'),
+        contexts: ['selection']
+    },
+    {
+        id: 'avatar',
+        title: chrome.i18n.getMessage('avatarChange'),
+        contexts: ['image', 'link']
     }
+];
+
+export const remove = () => {
+    chrome.contextMenus.removeAll();
 };
 
-export default () => {
-    // background
-    const { joinToGroup, changeName, setAvatar } = window.exports;
-
+export const create = () => {
     // Log creation status
     const onCreated = () => {
         if (chrome.runtime.lastError) {
             console.log(`Error: ${chrome.runtime.lastError}`);
         }
     };
+    // Create the context menus
+    contextMenus.forEach(contextMenu => chrome.contextMenus.create(contextMenu, onCreated));
 
-    // Create the context menu item.
-    chrome.contextMenus.create({
-        id: 'group',
-        title: 'Join To Group',
-        contexts: ['selection', 'link']
-    }, onCreated);
+    const saveTemplate = async (type, value) => {
+        const { saveTemplateAsk } = await new OptionsSync().getAll();
+        if (saveTemplateAsk && window.confirm(chrome.i18n.getMessage('saveQuestion'))) {
+            pushElement(`templates-${type}`, value);
+        }
+    };
 
-    chrome.contextMenus.create({
-        id: 'name',
-        title: 'Change Profile Name',
-        contexts: ['selection']
-    }, onCreated);
-
-    chrome.contextMenus.create({
-        id: 'avatar',
-        title: 'Change Avatar',
-        contexts: ['image', 'link']
-    }, onCreated);
+    // background
+    const { joinToGroup, changeName, setAvatar } = chrome.extension.getBackgroundPage().exports;
 
     const handleGroup = async (text, time, user) => {
         const url = normalizeUrl(text, { removeQueryParameters: [/[\s\S]+/i] });
 
         if (!isSteamGroup(url)) {
-            throw new Error('Not a steam group');
+            throw new Error(chrome.i18n.getMessage('notGroup'));
         }
 
         const onload = (groupName) => {
