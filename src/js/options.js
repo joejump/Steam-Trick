@@ -1,10 +1,17 @@
 import $ from 'jquery';
 import OptionsSync from 'webext-options-sync';
 import getWebApiKey from './steam/steam-web-api-key';
-import { showError, showNotification } from './libs/utils';
+import { showError, showNotification, openInNewTab } from './libs/utils';
+import { checkAuth } from './steam/steam-utils';
 import { create as createContextMenu, remove as removeContextMenus } from './libs/context-menus';
 
-// TODO: check auth
+// Check auth
+checkAuth()
+    .catch((e) => {
+        showError(e);
+        setTimeout(() => openInNewTab('https://steamcommunity.com/login'), 1000);
+    });
+
 $(document).ready(() => {
     const optionsSync = new OptionsSync();
     optionsSync.syncForm('#options-form');

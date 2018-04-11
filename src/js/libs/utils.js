@@ -49,3 +49,5 @@ export const permissionsRequest = permissions =>
             reject(new Error('The extension doesn\'t have the permissions'));
         });
     });
+
+export const switchToHttps = str => str.replace(/^http:\/\//i, 'https://');

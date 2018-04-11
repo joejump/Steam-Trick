@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { switchToHttps } from '../libs/utils';
 
 export const parseDataFromHTML = (html) => {
     const $html = $(html);
@@ -44,7 +45,7 @@ export const parseDataFromJSON = (player) => {
         avatarmedium: avatar
     } = player;
 
-    const profileURL = player.profileurl.replace('http://', 'https://');
+    const profileURL = switchToHttps(player.profileurl);
 
     return {
         profileURL,

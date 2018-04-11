@@ -1,9 +1,10 @@
 import api from '../libs/api';
+import { switchToHttps } from '../libs/utils';
 import { checkError, getSessionId } from './steam-utils';
 
 export default class SteamGroup {
     constructor(groupURL, user) {
-        this.groupURL = groupURL;
+        this.groupURL = switchToHttps(groupURL);
         this.user = user;
         this.chain = this._init();
     }
