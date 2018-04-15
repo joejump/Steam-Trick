@@ -482,13 +482,22 @@ nav.tabs {
 
 /*Toggle time input*/
 
-.toggle-time input[type="time"] {
+.toggle-time .time {
 	position: absolute;
 	visibility: hidden;
 	left: 80px;
+	width: 120px;
 }
 
-.toggle-time input[type="checkbox"]:checked~input[type="time"] {
+.toggle-time .formatted-time {
+	position: absolute;
+	visibility: hidden;
+    left: 175px;
+    top: -12px;
+}
+
+.toggle-time input[type="checkbox"]:checked ~ .time,
+.toggle-time input[type="checkbox"]:checked ~ .formatted-time  {
 	visibility: visible;
 }
 

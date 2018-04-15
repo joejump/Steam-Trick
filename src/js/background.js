@@ -10,9 +10,11 @@ import setAvatar from './steam/set-avatar';
 // defaults options
 new OptionsSync().define({
     defaults: {
-        audioVolume: '25',
+        audioVolume: 25,
         sourceType: 'xml',
         quickSet: false,
+
+        popupMaxRangeTime: 600,
 
         'context-template-group-time': 0,
         'context-template-name-time': 60,

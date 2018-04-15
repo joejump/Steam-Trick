@@ -6,6 +6,7 @@ import { getUserData } from './steam/user';
 import { localizeHTML } from './libs/localization';
 import { on as onMessage } from './libs/messaging';
 import { parseDataFromHTML } from './steam/parser';
+import parseTime from './libs/parse-time';
 import { openInNewTab, showError } from './libs/utils';
 import { checkAuth } from './steam/steam-utils';
 import { pushElement, removeElement, getElement } from './libs/storage';
@@ -51,20 +52,17 @@ const start = ({ user, options }) => {
 
     // return 0 when we "hide" time
     const getTime = (fieldset) => {
-        const time = $(`${fieldset} input[type=time]`)[0].valueAsNumber;
+        const time = $(`${fieldset} .time`).val();
         const hasTime = $(`${fieldset} .js-has-time`).is(':checked');
 
-        return hasTime ? (time / 1000) : 0;
+        return hasTime ? time : 0;
     };
 
-    // Valid time is 0 or greater 10
-    const checkTime = (fieldset, time) => {
-        if (Number.isNaN(time) || (time < 10 && time !== 0)) {
-            $(`${fieldset} input[type=time]`)[0].reportValidity();
-            return false;
-        }
-        return true;
-    };
+    // Show formatted time
+    $('.time').on('input', function () {
+        $(this).siblings('.formatted-time').text(parseTime(this.value));
+    });
+    $('.time').trigger('input');
 
     // group-fieldset
     const $groupField = $('#group-fieldset .js-field');
@@ -73,7 +71,6 @@ const start = ({ user, options }) => {
 
         // validation
         if (
-            !checkTime('#group-fieldset', time) ||
             !$groupField[0].reportValidity()
         ) { return; }
 
@@ -118,7 +115,6 @@ const start = ({ user, options }) => {
 
         // validation
         if (
-            !checkTime('#name-fieldset', time) ||
             !$nameField[0].reportValidity()
         ) { return; }
 
@@ -184,10 +180,9 @@ const start = ({ user, options }) => {
     // If time is 0 we want to hide time input
     const setTime = (fieldset, time) => {
         const hasTime = time !== 0;
-        const value = time * 1000;
 
         $(`${fieldset} .js-has-time`).prop('checked', hasTime);
-        $(`${fieldset} input[type=time]`)[0].valueAsNumber = value;
+        $(`${fieldset} .time`).val(time);
     };
 
     const setNameTpl = ({ name, time, plus }) => {
@@ -367,6 +362,8 @@ const getData = async () => {
     fillPage(user);
     // hide animation
     $('body').addClass('loaded');
+
+    $('input[type="range"].time').prop('max', options.popupMaxRangeTime || 1800);
 
     return { user, options };
 };
