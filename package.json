@@ -26,7 +26,7 @@
         "start": "webpack --mode development --progress --hide-modules --watch",
         "build": "webpack --mode development --progress --hide-modules",
         "build:prod": "webpack --mode production --progress --hide-modules",
-        "pack:firefox": "web-ext build -s dist -a artifacts",
+        "pack:firefox": "web-ext build -s dist -a artifacts --overwrite-dest",
         "lint": "eslint src/**/*.js webpack.config.js"
     },
     "author": "",

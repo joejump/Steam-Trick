@@ -19,7 +19,7 @@
         "https://api.steampowered.com/*"
     ],
 	"optional_permissions": [
-		"<all_urls>"
+        "<all_urls>"
 	],
     "applications": {
         "gecko": {

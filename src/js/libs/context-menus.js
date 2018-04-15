@@ -1,10 +1,16 @@
 import OptionsSync from 'webext-options-sync';
 import normalizeUrl from 'normalize-url';
-import api from './api';
-import { showError, containsPermissions, permissionsRequest } from './utils';
+import $ from 'jquery';
 import { pushElement } from './storage';
 import { isSteamGroup } from '../steam/steam-utils';
 import { getUserData } from '../steam/user';
+import {
+    showError,
+    showNotification,
+    containsPermissions,
+    permissionsRequest,
+    checkFileAccess
+} from './utils';
 
 const contextMenus = [
     {
@@ -38,12 +44,21 @@ export const create = () => {
     // Create the context menus
     contextMenus.forEach(contextMenu => chrome.contextMenus.create(contextMenu, onCreated));
 
+    let lastTemplate = {};
     const saveTemplate = async (type, value) => {
         const { saveTemplateAsk } = await new OptionsSync().getAll();
-        if (saveTemplateAsk && window.confirm(chrome.i18n.getMessage('saveQuestion'))) {
-            pushElement(`templates-${type}`, value);
+
+        if (saveTemplateAsk) {
+            lastTemplate = { type, value };
+            showNotification(chrome.i18n.getMessage('saveQuestion'), 'save-template');
         }
     };
+    // save template if user click on notification
+    chrome.notifications.onClicked.addListener((notificationId) => {
+        if (notificationId === 'save-template') {
+            pushElement(`templates-${lastTemplate.type}`, lastTemplate.value);
+        }
+    });
 
     // background
     const { joinToGroup, changeName, setAvatar } = chrome.extension.getBackgroundPage().exports;
@@ -78,7 +93,16 @@ export const create = () => {
                 origins: ['<all_urls>']
             });
         }
-        const blob = await api.get(url).then(body => body.blob());
+
+        if (url.startsWith('file:///') && !await checkFileAccess()) {
+            throw new Error('Access to File URLs is denied');
+        }
+
+        const blob = await $.ajax({
+            url,
+            cache: false,
+            xhrFields: { responseType: 'blob' }
+        });
 
         await setAvatar({ blob });
         saveTemplate('avatar', { blob });

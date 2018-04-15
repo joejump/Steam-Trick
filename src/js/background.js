@@ -10,10 +10,9 @@ import setAvatar from './steam/set-avatar';
 // defaults options
 new OptionsSync().define({
     defaults: {
-        audioVolume: '40',
+        audioVolume: '25',
         sourceType: 'xml',
         quickSet: false,
-        contextMenu: true,
 
         'context-template-group-time': 0,
         'context-template-name-time': 60,
@@ -103,20 +102,11 @@ window.exports = {
     activities: SNCTimer.activities
 };
 
-
-const initContextMenu = async () => {
-    const { contextMenu } = await new OptionsSync().getAll();
-    if (!contextMenu) { return; }
-
-    createContextMenus();
-};
-
-initContextMenu();
+createContextMenus();
 
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage();
-        createContextMenus();
     }
 
     if (details.reason === 'update') {

@@ -48,7 +48,7 @@
     "message": "Upload"
   },
   "saveQuestion": {
-    "message": "Do you want to save template?"
+    "message": "Do you want to save template? ||Yes||"
   },
   "groupJoin": {
     "message": "Join To Steam Group"

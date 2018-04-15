@@ -323,6 +323,10 @@ nav.tabs {
 	background: #2581fd;
 }
 
+.header {
+	padding: 3px 5px;
+}
+
 .header .user {
 	display: flex;
 	align-items: center;

@@ -16,7 +16,7 @@ export const showError = (error) => {
     });
 };
 
-export const showNotification = (arg) => {
+export const showNotification = (arg, notificationId, callback) => {
     const opt = (typeof arg === 'string') ? { message: arg } : arg;
     const options = Object.assign(opt, {
         type: 'basic',
@@ -24,7 +24,7 @@ export const showNotification = (arg) => {
         title: chrome.runtime.getManifest().name
     });
 
-    chrome.notifications.create(options);
+    chrome.notifications.create(notificationId, options, callback);
 };
 
 export const openInNewTab = url =>
@@ -51,3 +51,10 @@ export const permissionsRequest = permissions =>
     });
 
 export const switchToHttps = str => str.replace(/^http:\/\//i, 'https://');
+
+export const checkFileAccess = () =>
+    new Promise((resolve) => {
+        chrome.extension.isAllowedFileSchemeAccess((isAllowedAccess) => {
+            resolve(isAllowedAccess);
+        });
+    });

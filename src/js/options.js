@@ -1,9 +1,8 @@
 import $ from 'jquery';
 import OptionsSync from 'webext-options-sync';
 import getWebApiKey from './steam/steam-web-api-key';
-import { showError, showNotification, openInNewTab } from './libs/utils';
+import { showError, openInNewTab } from './libs/utils';
 import { checkAuth } from './steam/steam-utils';
-import { create as createContextMenu, remove as removeContextMenus } from './libs/context-menus';
 
 // Check auth
 checkAuth()
@@ -23,12 +22,6 @@ $(document).ready(() => {
             $('.apikey-block').show();
         } else {
             $('.apikey-block').hide();
-        }
-
-        if (options.contextMenu) {
-            $('.context-menu-template').show();
-        } else {
-            $('.context-menu-template').hide();
         }
     };
 
@@ -57,15 +50,6 @@ $(document).ready(() => {
         if (this.value === 'json') {
             setApiKey();
         }
-    });
-
-    $('input[name="contextMenu"]').change(function () {
-        if (this.checked) {
-            createContextMenu();
-        } else {
-            removeContextMenus();
-        }
-        showNotification('You may need to restart your browser');
     });
 
     $('#get-key').click((e) => {
