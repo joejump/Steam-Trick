@@ -1,6 +1,7 @@
 import OptionsSync from 'webext-options-sync';
 import normalizeUrl from 'normalize-url';
 import $ from 'jquery';
+import isBase64 from 'is-base64';
 import { pushElement } from './storage';
 import { isSteamGroup } from '../steam/steam-utils';
 import { getUserData } from '../steam/user';
@@ -11,6 +12,7 @@ import {
     permissionsRequest,
     checkFileAccess
 } from './utils';
+import api from './api';
 
 const contextMenus = [
     {
@@ -83,6 +85,16 @@ export const create = () => {
         });
     };
 
+    const getBlob = url =>
+        (isBase64(url)
+            ? api.get(url).then(body => body.blob())
+            : $.ajax({
+                url,
+                cache: false,
+                xhrFields: { responseType: 'blob' }
+            })
+        );
+
     const handleAvatar = async (url) => {
         try {
             await containsPermissions({
@@ -98,11 +110,7 @@ export const create = () => {
             throw new Error('Access to File URLs is denied');
         }
 
-        const blob = await $.ajax({
-            url,
-            cache: false,
-            xhrFields: { responseType: 'blob' }
-        });
+        const blob = await getBlob(url);
 
         await setAvatar({ blob });
         saveTemplate('avatar', { blob });

@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "name": "Steam Name Changer",
+    "name": "Steam Helper",
     "version": "1.3",
     "description": "__MSG_description__",
     "icons": {
@@ -35,11 +35,11 @@
     },
     "default_locale": "en",
     "browser_action": {
-        "default_title": "Steam Name Changer",
+        "default_title": "Steam Helper",
         "default_icon": "img/48.png",
         "default_popup": "html/popup.html"
     },
-    "short_name": "SNC",
+    "short_name": "Steam Helper",
 	"options_ui": {
 		"chrome_style": true,
 		"page": "html/options.html"
