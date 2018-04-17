@@ -2,7 +2,7 @@ import parse from './parse-time';
 
 export default class CountDownTimer {
     constructor(duration, granularity = 500) {
-        this.duration = duration;
+        this.duration = Number.parseInt(duration, 10);
         this.granularity = granularity;
 
         this.tickFtns = [];

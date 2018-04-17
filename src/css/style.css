@@ -342,6 +342,10 @@ nav.tabs {
 	justify-content: space-between;
 }
 
+#username {
+	font-size: 25px;
+}
+
 .user .info .id64 input {
 	border: none;
 	outline: none;
@@ -582,6 +586,10 @@ nav.tabs {
 
 .templates table .remove:hover {
 	background-color: #dcdcdc;
+}
+.templates .group .item a,
+.templates .group .item a:visited {
+	color: inherit;
 }
 
 .templates .avatar {

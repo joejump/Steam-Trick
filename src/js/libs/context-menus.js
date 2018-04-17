@@ -37,6 +37,9 @@ export const remove = () => {
 };
 
 export const create = () => {
+    // background
+    const { joinToGroup, changeName, setAvatar } = chrome.extension.getBackgroundPage().exports;
+
     // Log creation status
     const onCreated = () => {
         if (chrome.runtime.lastError) {
@@ -59,11 +62,10 @@ export const create = () => {
     chrome.notifications.onClicked.addListener((notificationId) => {
         if (notificationId === 'save-template') {
             pushElement(`templates-${lastTemplate.type}`, lastTemplate.value);
+
+            chrome.notifications.clear('save-template');
         }
     });
-
-    // background
-    const { joinToGroup, changeName, setAvatar } = chrome.extension.getBackgroundPage().exports;
 
     const handleGroup = async (text, time, user) => {
         const url = normalizeUrl(text, { removeQueryParameters: [/[\s\S]+/i] });
@@ -164,6 +166,7 @@ export const create = () => {
             }
         } catch (e) {
             showError(e);
+            console.error(e);
         }
     });
 };

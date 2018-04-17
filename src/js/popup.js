@@ -24,10 +24,10 @@ const fillPage = ({
     $('.user').addClass(onlineState);
 
     const $username = $('#username');
-    if ($username.text(personaName).width() > 300) {
+    $username.text(personaName);
+
+    if ($username.width() > 300) {
         $username.css('font-size', '18px');
-    } else {
-        $username.css('font-size', '25px');
     }
 
     $('.user .state-message').html(stateMessage);
@@ -182,7 +182,9 @@ const start = ({ user, options }) => {
         const hasTime = time !== 0;
 
         $(`${fieldset} .js-has-time`).prop('checked', hasTime);
-        $(`${fieldset} .time`).val(time);
+        $(`${fieldset} .time`)
+            .val(time)
+            .trigger('input');
     };
 
     const setNameTpl = ({ name, time, plus }) => {
@@ -235,6 +237,7 @@ const start = ({ user, options }) => {
         renderTemplatesPanel(type);
     });
 
+    $('.templates').on('click', '.group .item a', e => e.preventDefault());
 
     // DONATE
     const playAudio = (src, volume) => {
@@ -357,7 +360,10 @@ const getData = async () => {
     await waitDocument();
 
     // localize HTML
-    localizeHTML($('#unlocalizedPage').text(), 'body');
+    const $unlocalizedPage = $('#unlocalizedPage');
+    localizeHTML($unlocalizedPage.text(), 'body');
+    $unlocalizedPage.remove();
+
     // fill page with data
     fillPage(user);
     // hide animation

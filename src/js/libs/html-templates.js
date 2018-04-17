@@ -11,7 +11,13 @@ export const renderTemplates = async (type, data) => {
         const removing = '<td class="remove">&#x2716;</td>';
 
         if (type === 'name') {
-            const th = '<tr><th>Name</th><th class="time">Time</th><th class="symbol">+</th><th class="symbol">&#x2716;</th></tr>';
+            const th = '<tr>' +
+                            '<th>Name</th>' +
+                            '<th class="time">Time</th>' +
+                            '<th class="symbol">+</th>' +
+                            '<th class="symbol">&#x2716;</th>' +
+                        '</tr>';
+
             const td = templates.reduce((prev, { name, plus, time }) =>
                 `${prev}<tr class="item">
                     <td title="${name}">${name}</td>
@@ -24,9 +30,17 @@ export const renderTemplates = async (type, data) => {
         }
 
         if (type === 'group') {
-            const th = '<tr><th>Name(URL)</th><th class="time">Time</th><th class="symbol">&#x2716;</th></tr>';
+            const th = '<tr>' +
+                        '<th>Name(URL)</th>' +
+                        '<th class="time">Time</th>' +
+                        '<th class="symbol">&#x2716;</th>' +
+                    '</tr>';
+
             const td = templates.reduce((prev, { url, groupName, time }) =>
-                `${prev}<tr class="item"><td title="${url}">${groupName}</td><td>${getTime(time)}</td>${removing}</tr>`, '');
+                `${prev}<tr class="item">` +
+                            `<td><a title="${url}" href="${url}">${groupName}</a></td>` +
+                            `<td>${getTime(time)}</td>${removing}` +
+                        '</tr>', '');
 
             return `<table class="js-template group" data-type="group">${th}${td}</table>`;
         }
@@ -35,11 +49,12 @@ export const renderTemplates = async (type, data) => {
             const images = templates.reduce((prev, { blob }) => {
                 const avatar = URL.createObjectURL(blob);
 
-                return `${prev}<div class="item" title="Click to set.">
-                    <img src="${avatar}">
-                    <span class="remove">&#x2716;</span>
-                </div>`;
+                return `${prev}<div class="item" title="Click to set.">` +
+                            `<img src="${avatar}">` +
+                            '<span class="remove">&#x2716;</span>' +
+                        '</div>';
             }, '');
+
             return `<div class="js-template avatar" data-type="avatar">${images}</div>`;
         }
     }
