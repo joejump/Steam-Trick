@@ -1,6 +1,6 @@
 import { getCookie } from '../libs/utils';
 
-const getSteamCookie = details => getCookie(Object.assign({}, { url: 'http://steamcommunity.com' }, details));
+const getSteamCookie = details => getCookie(Object.assign({}, { url: 'https://steamcommunity.com' }, details));
 
 // getSessionId form cookies
 export const getSessionId = async () => {
@@ -9,12 +9,12 @@ export const getSessionId = async () => {
 };
 
 export const getId64 = async () => {
-    const { value: steamLogin } = await getSteamCookie({ name: 'steamLogin' });
+    const { value: steamLogin } = await getSteamCookie({ name: 'steamLoginSecure' });
     const id64 = steamLogin.split('%')[0];
     return id64;
 };
 
-export const checkAuth = () => getSteamCookie({ name: 'steamLogin' });
+export const checkAuth = () => getSteamCookie({ name: 'steamLoginSecure' });
 
 // Check Steam error which can be in html after request
 export const checkError = (html, selector) => {

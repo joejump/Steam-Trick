@@ -10,16 +10,16 @@
         "webext-options-sync": "^0.15.1"
     },
     "devDependencies": {
+        "webpack": "^4.4.1",
+        "webpack-cli": "^2.0.13",
         "clean-webpack-plugin": "^0.1.19",
         "copy-webpack-plugin": "^4.5.1",
+        "imagemin-webpack-plugin": "^2.1.5",
+        "uglifyjs-webpack-plugin": "^1.2.4",
         "eslint": "^4.19.1",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-plugin-import": "^2.9.0",
-        "imagemin-webpack-plugin": "^2.1.1",
-        "uglifyjs-webpack-plugin": "^1.2.4",
-        "web-ext": "^2.6.0",
-        "webpack": "^4.4.1",
-        "webpack-cli": "^2.0.13"
+        "web-ext": "^2.7.0"
     },
     "scripts": {
         "test": "web-ext lint -s dist",
