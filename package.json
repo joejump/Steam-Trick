@@ -1,6 +1,6 @@
 {
-    "name": "steam_name_changer",
-    "version": "1.3.0",
+    "name": "steam_trick",
+    "version": "1.3.2",
     "dependencies": {
         "clipboard": "^1.7.1",
         "is-base64": "0.0.4",

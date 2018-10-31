@@ -1,6 +1,6 @@
-# Steam Helper
+# Steam Trick
 
-Feel free to change name, avatar, join to group on Steam in one click
+Now it's eash to change name, avatar, join to group on Steam.
 
 # Installation
 
