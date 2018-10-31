@@ -258,11 +258,12 @@ const start = ({ user, options }) => {
         }
     });
 
-    $('#donate-panel .cash li a').click((e) => {
-        e.preventDefault();
-
-        setTimeout(() => openInNewTab('https://goo.gl/xKtbiU'), 2500);
+    $('#donate-panel .cash li a').click(function (e) {
+        const url = $(this).attr('href');
+        setTimeout(() => openInNewTab(url), 2500);
         playAudio('../audio/2.mp3', options.audioVolume);
+
+        e.preventDefault();
     });
 
     (new Clipboard('.share a[data-clipboard-text]')).on('success', (e) => {

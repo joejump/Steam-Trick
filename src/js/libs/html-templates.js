@@ -63,7 +63,7 @@ export const renderTemplates = async (type, data) => {
 };
 
 export const renderDonateData = async () => {
-    const data = await $.getJSON('https://www.jasonbase.com/things/x34M');
+    const data = await $.getJSON('https://meyson.github.io/Steam%20Trick/donators.json');
     data.users.sort((a, b) => (+a.cost < +b.cost ? 1 : -1));
 
     const users = data.users.reduce((prev, user) => {
